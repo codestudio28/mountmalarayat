@@ -1,0 +1,13 @@
+.nav-text{
+    color:#000000;
+}
+
+.sub-menu:hover{
+    background-color:#135200!important;
+    color:#ffffff!important
+}
+.sub-sub-menu:hover{
+    background-color:#69c0ff;
+    color:#ffffff;
+}
+

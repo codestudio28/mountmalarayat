@@ -1,0 +1,131 @@
+body {
+  margin: 0;
+  font-family: "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+.modified-item :hover {
+  border-bottom: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+
+.sub-modified-item:hover {
+  border-bottom: 2px solid #ffffff !important;
+  color: #ffffff !important;
+  font-weight: bold!important;
+  
+}
+
+
+
+.ant-menu-submenu-title:hover {
+      border-style:none!important;
+      background: #135200!important;
+      color:#ffffff!important; 
+}
+
+.ant-menu-submenu-title {
+  border-style:none!important;
+  background: #ffffff!important;
+  color:#135200!important; 
+  font-weight: bold!important;
+}
+.ant-menu.item:hover{
+  
+  background: #ffffff!important;
+}
+.ant-carousel .slick-slide {
+  text-align: center;
+  height: 30em;
+  line-height: 30em;
+  background: #364d79;
+  overflow: hidden;
+}
+
+.ant-carousel .slick-slide h3 {
+  color: #fff;
+}
+
+.side-title h3{
+  color:#fff;
+}
+.side-title{
+  text-align: center;
+  background: #c3c4c5;
+  overflow: hidden;
+  height: 14em;
+  line-height: 14em;
+  border-radius: 0.5em;
+}
+.side-title-top{
+  text-align: center;
+  background: #c3c4c5;
+  overflow: hidden;
+  height: 10em;
+  line-height: 10em;
+}
+.side-title-bottom{
+  text-align: center;
+  background: #800000;
+  overflow: hidden;
+  height: 4em;
+  line-height: 4em;
+}
+.card-article{
+  width:98%;
+  min-height:15em;
+  height:auto;
+  background-color:#eeeeee;
+  border-radius: 0.5em;
+  box-shadow:0.25em 0.5em #dedede;
+}
+.card-image{
+  border-radius:0.5em 0em 0em 0.5em;
+  height:15em;
+  width:100%;
+}
+.card-title{
+  font-size:1.5em;
+  color:#000000;
+}
+
+.card-title-lower{
+  font-size:1em;
+  color:#ffffff;
+}
+.nav-menu-item :hover {
+  border-bottom: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+.nav-item{
+  color: #ffffff !important;
+}
+.nav-item :hover{
+  border-bottom: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+.article-body{
+  height:auto;
+}
+.iconshare-facebook{
+  font-size:2.5em;
+}
+.iconshare-twitter{
+  font-size:2.5em;
+}
+
+.iconshare-twitter :hover{
+  color:#40a9ff;
+}
+
+.iconshare-facebook :hover{
+  color:#2f54eb;
+}
+

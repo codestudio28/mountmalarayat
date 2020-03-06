@@ -1,0 +1,35 @@
+{
+  "name": "Todo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "cd todo-react && npm run build",
+    "install-client": "cd todo-react && npm install",
+    "heroku-postbuild": "npm run install-client && npm run build",
+    "start": "node server.js",
+    "server": "node server.js",
+    "client": "npm start --prefix todo-react",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "engines":{
+    "node":"12.13.1",
+    "npm": "6.12.1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express-fileupload": "^1.1.0",
+    "axios": "^0.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.6",
+    "mongoose": "^5.8.1"
+  },
+  "devDependencies": {
+    "concurrently": "^5.0.2"
+  }
+}
