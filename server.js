@@ -41,13 +41,13 @@ const paymentschemeRouter = require('./routes/paymentscheme');
 const messageRouter = require('./routes/message');
 const listingsRouter = require('./routes/listings');
 
-app.use('/accountrouter',userRouter);
-app.use('/propertyrouter',propertyRouter);
-app.use('/clientrouter',clientRouter);
-app.use('/proptyperouter',proptypeRouter);
-app.use('/paymentschemerouter',paymentschemeRouter);
-app.use('/messagerouter',messageRouter);
-app.use('/listingsrouter',listingsRouter);
+app.use('/api/accountrouter',userRouter);
+app.use('/api/propertyrouter',propertyRouter);
+app.use('/api/clientrouter',clientRouter);
+app.use('/api/proptyperouter',proptypeRouter);
+app.use('/api/paymentschemerouter',paymentschemeRouter);
+app.use('/api/messagerouter',messageRouter);
+app.use('/api/listingsrouter',listingsRouter);
 
 // 3
 // app.post('/profile', (req, res) => {
