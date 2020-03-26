@@ -13,7 +13,7 @@ class TodoStore {
 @observable loading=false;
 @observable ispassword=false;
 @observable accountimage='';
-@observable updateimage=false;
+@observable updateimage=false;git
 @observable profileimage='Choose File';
 @observable isadding =false;
 @observable whatpage =0;
@@ -60,8 +60,103 @@ class TodoStore {
 @observable bathroom ='';
 @observable tcp ='';
 @observable listingimage ='';
+@observable searchclient ='';
+@observable displayname ='';
+@observable displaykey ='';
+@observable displayaddress ='';
+@observable displaycontactnumber ='';
+@observable displaypropaddress ='';
+@observable displaytypes ='';
+@observable displayarea ='';
+@observable displayprice ='';
+@observable reservationfee ='';
+@observable loanable ='';
+@observable equitymonth ='12';
+@observable computes =false;
+@observable monthlymisc =0;
+@observable totalmisc =0;
+@observable totalequity =0;
+@observable newtotalequity =0;
+@observable monthlyequity =0;
+@observable newreservationfee =0;
+@observable totalamortization =0;
+@observable monthlyamortization =0;
+@observable numberofyears =0;
+@observable financing ='';
+@observable displaypaymentscheme ='Choose Payment Scheme';
 
-
+@action setFinancing = (value) => {
+  this.financing=value;
+}
+@action setTotalAmortization = (value) => {
+  this.totalamortization=value;
+}
+@action setMonthlyAmortization = (value) => {
+  this.monthlyamortization=value;
+}
+@action setNumberYears = (value) => {
+  this.numberofyears=value;
+}
+@action setMonthlyMisc = (value) => {
+  this.monthlymisc=value;
+}
+@action setNewReservationFee = (value) => {
+  this.newreservationfee=value;
+}
+@action setTotalMisc = (value) => {
+  this.totalmisc=value;
+}
+@action setTotalEquity = (value) => {
+  this.totalequity=value;
+}
+@action setNewTotalEquity = (value) => {
+  this.newtotalequity=value;
+}
+@action setMonthlyEquity = (value) => {
+  this.monthlyequity=value;
+}
+@action setComputes = (value) => {
+  this.computes=value;
+}
+@action setEquityMonth = (value) => {
+  this.equitymonth=value;
+}
+@action setLoanable = (e) => {
+  this.loanable=e.target.value;
+}
+@action setReservationFee = (e) => {
+  this.reservationfee=e.target.value;
+}
+@action setDisplayPaymentScheme = (value) => {
+  this.displaypaymentscheme=value;
+}
+@action setDisplayPropAddress = (value) => {
+  this.displaypropaddress=value;
+}
+@action setDisplayTypes = (value) => {
+  this.displaytypes=value;
+}
+@action setDisplayArea = (value) => {
+  this.displayarea=value;
+}
+@action setDisplayPrice = (value) => {
+  this.displayprice=value;
+}
+@action setDisplayName = (value) => {
+  this.displayname=value;
+}
+@action setDisplayKey = (value) => {
+  this.displaykey=value;
+}
+@action setDisplayAddress = (value) => {
+  this.displayaddress=value;
+}
+@action setDisplayContactNumber = (value) => {
+  this.displaycontactnumber=value;
+}
+@action setSearchClient = (e) => {
+  this.searchclient=e.target.value;
+}
 @action setHouseModel = (e) => {
   this.housemodel=e.target.value;
 }
@@ -310,8 +405,79 @@ class TodoStore {
 }
 
 // Computed
+@computed get getFinancing(){
+  return this.financing;
+}
+@computed get getTotalAmortization(){
+  return this.totalamortization;
+}
+@computed get getMonthlyAmortization(){
+  return this.monthlyamortization;
+}
+@computed get getNumberYears(){
+  return this.numberofyears;
+}
 
-
+@computed get getNewReservationFee(){
+  return this.newreservationfee;
+}
+@computed get getTotalMisc(){
+  return this.totalmisc;
+}
+@computed get getTotalEquity(){
+  return this.totalequity;
+}
+@computed get getNewTotalEquity(){
+  return this.newtotalequity;
+}
+@computed get getMonthlyMisc(){
+  return this.monthlymisc;
+}
+@computed get getMonthlyEquity(){
+  return this.monthlyequity;
+}
+@computed get getComputes(){
+  return this.computes;
+}
+@computed get getEquityMonth(){
+  return this.equitymonth;
+}
+@computed get getLoanable(){
+  return this.loanable;
+}
+@computed get getReservationFee(){
+  return this.reservationfee;
+}
+@computed get getDisplayPaymentScheme(){
+  return this.displaypaymentscheme;
+}
+@computed get getDisplayPropAddress(){
+  return this.displaypropaddress;
+}
+@computed get getDisplayTypes(){
+  return this.displaytypes;
+}
+@computed get getDisplayArea(){
+  return this.displayarea;
+}
+@computed get getDisplayPrice(){
+  return this.displayprice;
+}
+@computed get getDisplayName(){
+  return this.displayname;
+}
+@computed get getDisplayKey(){
+  return this.displaykey;
+}
+@computed get getDisplayAddress(){
+  return this.displayaddress;
+}
+@computed get getDisplayContactNumber(){
+  return this.displaycontactnumber;
+}
+@computed get getSearchClient(){
+  return this.searchclient;
+}
 @computed get getIsPassword(){
   return this.ispassword;
 }

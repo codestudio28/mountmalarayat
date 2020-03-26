@@ -54,7 +54,10 @@ class SideComponent extends Component {
        }
        const gotoListings=()=>{
         window.open("/listings","_self");
-   }
+        }
+        const gotoBuy=()=>{
+            window.open("/buy","_self");
+            }
         return (
            
             <React.Fragment>
@@ -91,7 +94,7 @@ class SideComponent extends Component {
                                     </span>
                                 }
                             >
-                                <Menu.Item key="scholar-new" className="sub-menu">
+                                <Menu.Item key="scholar-new" className="sub-menu" onClick={gotoBuy}>
                                    Buy Property
                                 </Menu.Item>
                                 <Menu.Item key="scholar-current" className="sub-menu">

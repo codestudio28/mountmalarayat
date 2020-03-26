@@ -647,10 +647,8 @@ class PageContent extends Component {
                                     <Col xs={12} md={12} >
                                         <Select defaultValue={TodoStore.getType} style={{ width: '90%' }}
                                             onChange={TodoStore.setType}>
-                                            <Option value="RH">RH</Option>
-                                            <Option value="1SD">1SD</Option>
-                                            <Option value="2SD">2SD</Option>
-                                            <Option value="LO">LO</Option>
+                                             {propertype}
+                                        
                                         </Select>
                                     </Col>
                                     <Col xs={12} md={12} style={{ marginTop: '0.5em' }}>
