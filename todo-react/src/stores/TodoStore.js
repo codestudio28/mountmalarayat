@@ -83,8 +83,22 @@ class TodoStore {
 @observable monthlyamortization =0;
 @observable numberofyears =0;
 @observable financing ='';
+@observable startdate ='2019/01/01';
 @observable displaypaymentscheme ='Choose Payment Scheme';
+@observable amortization =[];
 
+@action setAmortization = (id,dates,equity,mf) => {
+    this.amortization.push({
+       id:id,
+       dates:dates,
+       equity:equity,
+       mf:mf
+    })
+}
+
+@action setStartDate = (date,dateString) => {
+  this.startdate=dateString;
+}
 @action setFinancing = (value) => {
   this.financing=value;
 }
@@ -405,6 +419,12 @@ class TodoStore {
 }
 
 // Computed
+@computed get getAmortization(){
+  return this.amortization;
+}
+@computed get getStartDate(){
+  return this.startdate;
+}
 @computed get getFinancing(){
   return this.financing;
 }

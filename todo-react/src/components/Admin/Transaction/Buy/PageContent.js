@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Layout, Menu, Icon, Button, Avatar, Breadcrumb, Select, Pagination, Modal, Checkbox, notification, Tooltip, Popconfirm } from 'antd';
+import { Layout, Menu, Icon, Button, Avatar, Breadcrumb, Select, Pagination, Modal, Checkbox, notification, Tooltip, Popconfirm,DatePicker } from 'antd';
 import { Container, Row, Col } from 'react-bootstrap';
+import moment from 'moment';
 import './content.css';
 import { Input } from 'antd';
 import { inject, observer } from 'mobx-react';
@@ -16,6 +17,7 @@ const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 const ButtonGroup = Button.Group;
 const { Option } = Select;
+const dateFormat = 'YYYY/MM/DD';
 
 var fullname;
 var contactnumber;
@@ -196,6 +198,8 @@ class PageContent extends Component {
                 }
 
             })
+            const dateAmort =[];
+            var tableamort='';
         const computePayment = () => {
             var fullname = TodoStore.getDisplayName;
             var TCP = TodoStore.getDisplayPrice;
@@ -212,10 +216,12 @@ class PageContent extends Component {
                 var schemename;
                 var percentage;
                 var misc = TodoStore.getMisc / 100;
+               
                 var newmisc = parseFloat(newTCP) * parseFloat(misc);
-                var equity = parseFloat(newTCP) - parseFloat(loanable) - parseFloat(newmisc);
+                var equity = parseFloat(newTCP) - parseFloat(loanable);
                 var monthlymisc = (parseFloat(newmisc) / parseFloat(equitymonth)).toFixed(2);
-                var newtotalequity = (parseFloat(equity) - parseFloat(reservationfee)).toFixed(2);
+                var newtotalequity = (parseFloat(equity));
+
                 var monthlyequity = (parseFloat(newtotalequity) / parseFloat(equitymonth)).toFixed(2);
                 var formatter = new Intl.NumberFormat('en-US', {
                     style: 'currency',
@@ -236,15 +242,77 @@ class PageContent extends Component {
                 });
                 var totalamortization = parseFloat(newTCP) - parseFloat(equity);
                 var monthlyamortization = parseFloat(totalamortization) * parseFloat(percentage).toFixed(2);
-                var newtotalamortization = parseFloat(monthlyamortization) * parseFloat(numyear) * 12.0;
+                var newtotalamortization = parseFloat(monthlyamortization) + parseFloat(monthlymisc);
                 TodoStore.setTotalAmortization(formatter.format(newtotalamortization));
                 TodoStore.setMonthlyAmortization(formatter.format(monthlyamortization));
                 TodoStore.setNumberYears(numyear);
                 TodoStore.setFinancing(schemename.toUpperCase());
-            }
 
+            var todays = TodoStore.getStartDate;    
+            var days = 19;
+            var dt = new Date(todays);
+            dt.setMonth( dt.getMonth() + 1 );
+          
+            for(var x=0;x<parseInt(equitymonth);x++){
+                var days;
+                var dt;
+                // dt.setMonth( dt.getMonth() + 1 );
+                var years;
+                var months;
+                var newday;
+                var d;
+                var dayName;
+                var amortdate;
+            
+                if(x===0){
+                    todays = TodoStore.getStartDate;    
+                    days = 19;
+                    dt = new Date(todays);
+                    // dt.setMonth( dt.getMonth() + 1 );
+                    years = dt.getFullYear();
+                    months = dt.getMonth()+1;
+                    newday = years+"/"+months+"/"+days;
+                    d = new Date(newday);
+                    dayName = d.getDay();
+                    
+                    if(dayName===0){
+                        days=20;
+                    }else{
+                        days=19;
+                    }
+                     amortdate=years+"/"+months+"/"+days;
+                }else{
+                    todays = amortdate;    
+                    days = 19;
+                    dt = new Date(todays);
+                    dt.setMonth( dt.getMonth() + 1 );
+                    years = dt.getFullYear();
+                    months = dt.getMonth()+1;
+                    newday = years+"/"+months+"/"+days;
+                    d = new Date(newday);
+                    dayName = d.getDay();
+                    
+                    if(dayName===0){
+                        days=20;
+                    }else{
+                        days=19;
+                    }
+                     amortdate=years+"/"+months+"/"+days;
+                }
+               
+                dateAmort.push({
+                    id:x+1,
+                    dates:amortdate,
+                    equity:monthlyequity,
+                    mf:monthlymisc
+                });
+            }
+            console.log(dateAmort);
+        }
+        
 
         }
+       
         const openNotification = (value) => {
             if (value === "Blank") {
                 notification.open({
@@ -446,19 +514,26 @@ class PageContent extends Component {
                                                             padding: '1em'
                                                         }}>Loanable Amount:</h4>
                                                     </Col>
-                                                    <Col xs={3} md={3}>
+                                                    <Col xs={2} md={2}>
                                                         <h4 style={{
                                                             fontSize: '1em',
                                                             color: '#d9d9d9',
                                                             padding: '1em'
                                                         }}>Reservation Fee:</h4>
                                                     </Col>
-                                                    <Col xs={3} md={3}>
+                                                    <Col xs={2} md={2}>
                                                         <h4 style={{
                                                             fontSize: '1em',
                                                             color: '#d9d9d9',
                                                             padding: '1em'
                                                         }}>Choose Month:</h4>
+                                                    </Col>
+                                                    <Col xs={2} md={2}>
+                                                        <h4 style={{
+                                                            fontSize: '1em',
+                                                            color: '#d9d9d9',
+                                                            padding: '1em'
+                                                        }}>Choose Start Date:</h4>
                                                     </Col>
                                                 </Row>
                                             </Col>
@@ -477,17 +552,22 @@ class PageContent extends Component {
                                                             onChange={TodoStore.setLoanable}
                                                             value={TodoStore.getLoanable} />
                                                     </Col>
-                                                    <Col xs={3} md={3}>
+                                                    <Col xs={2} md={2}>
                                                         <Input placeholder="Enter reservation fee"
                                                             onChange={TodoStore.setReservationFee}
                                                             value={TodoStore.getReservationFee} />
                                                     </Col>
-                                                    <Col xs={3} md={3}>
+                                                    <Col xs={2} md={2}>
                                                         <Select defaultValue={TodoStore.getEquityMonth} style={{ width: '100%' }} onChange={TodoStore.setEquityMonth}>
                                                             <Option value="12">12</Option>
                                                             <Option value="24">24</Option>
                                                             <Option value="36">36</Option>
                                                         </Select>
+                                                    </Col>
+                                                    <Col xs={2} md={2}>
+                                                        <DatePicker 
+                                                        onChange={TodoStore.setStartDate}
+                                                        defaultValue={moment(`${TodoStore.getStartDate}`, dateFormat)} format={dateFormat} />
                                                     </Col>
                                                 </Row>
                                             </Col>
@@ -509,6 +589,7 @@ class PageContent extends Component {
                                                 <React.Fragment>
                                                     <Col xs={12} md={12}>
                                                         <table >
+                                                            <thead>
                                                             <tr>
                                                                 <th>
                                                                     <h4 style={{
@@ -574,7 +655,8 @@ class PageContent extends Component {
                                                                         color: '#8c8c8c',
                                                                         padding: '1em'
                                                                     }}> <span style={{ color: '#000000' }}>
-                                                                            {TodoStore.getTotalEquity} - {TodoStore.getNewReservationFee}(RF) = {TodoStore.getNewTotalEquity}</span></h4>
+                                                                            {/* {TodoStore.getTotalEquity} - {TodoStore.getNewReservationFee}(RF) = {TodoStore.getNewTotalEquity}</span></h4> */}
+                                                                            {TodoStore.getTotalEquity}</span></h4>
                                                                 </th>
                                                             </tr>
                                                             <tr>
@@ -600,7 +682,7 @@ class PageContent extends Component {
                                                                         fontSize: '1em',
                                                                         color: '#8c8c8c',
                                                                         padding: '1em'
-                                                                    }}>Total Amortization:</h4>
+                                                                    }}>Start Date of Payment:</h4>
                                                                 </th>
                                                                 <th>
                                                                     <h4 style={{
@@ -608,30 +690,18 @@ class PageContent extends Component {
                                                                         color: '#8c8c8c',
                                                                         padding: '1em'
                                                                     }}> <span style={{ color: '#000000' }}>
-                                                                            {TodoStore.getTotalAmortization} @ {TodoStore.getNumberYears} years </span></h4>
+                                                                            {TodoStore.getStartDate}  </span></h4>
                                                                 </th>
                                                             </tr>
-                                                            <tr>
-                                                                <th>
-                                                                    <h4 style={{
-                                                                        fontSize: '1em',
-                                                                        color: '#8c8c8c',
-                                                                        padding: '1em'
-                                                                    }}>Monthly Amortization:</h4>
-                                                                </th>
-                                                                <th>
-                                                                    <h4 style={{
-                                                                        fontSize: '1em',
-                                                                        color: '#8c8c8c',
-                                                                        padding: '1em'
-                                                                    }}> <span style={{ color: '#000000' }}>
-                                                                            {TodoStore.getMonthlyAmortization}</span></h4>
-                                                                </th>
-                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+
+                                                            </tbody>
+                                                           
                                                         </table>
 
                                                     </Col>
-
+                                                           
                                                 </React.Fragment>
                                             }
 
