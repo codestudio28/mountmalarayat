@@ -8,7 +8,7 @@ import { Row, Col } from 'antd';
 import BrandName from '../../Brandname'
 import SideComponent from '../../SideComponent';
 import Headers from '../../Headers';
-import PageContent from './PageContent';
+import SinglePayment from './SinglePayment';
 import Footers from '../../Footers';
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -57,7 +57,7 @@ class PageLayout extends Component {
                     
                     <Layout style={{backgroundColor:'#eeeeee'}}>
                         <Headers/>
-                        <PageContent/>
+                        <SinglePayment transact={this.props.id}/>
                         <Footers/>
                         {/* <Headers/>
                         <PageContent/>

@@ -57,7 +57,25 @@ class SideComponent extends Component {
         }
         const gotoBuy=()=>{
             window.open("/buy","_self");
-            }
+        }
+        const gotoPayment=()=>{
+            window.open("/payment","_self");
+        }
+        const gotoPropertyList=()=>{
+            window.open("/property-report","_self");
+        }
+        const gotoClientList=()=>{
+            window.open("/client-report","_self");
+        }
+        const gotoPaymentType=()=>{
+            window.open("/paymenttype-report","_self");
+        }
+        const gotoIncome=()=>{
+            window.open("/collection-report","_self");
+        }
+        const gotoPayable=()=>{
+            window.open("/payable","_self");
+        }
         return (
            
             <React.Fragment>
@@ -97,8 +115,11 @@ class SideComponent extends Component {
                                 <Menu.Item key="scholar-new" className="sub-menu" onClick={gotoBuy}>
                                    Buy Property
                                 </Menu.Item>
-                                <Menu.Item key="scholar-current" className="sub-menu">
+                                <Menu.Item key="scholar-current" className="sub-menu"  onClick={gotoPayment}>
                                     Payment
+                                </Menu.Item>
+                                <Menu.Item key="scholar-current" className="sub-menu"  onClick={gotoPayable}>
+                                    Account's Payable
                                 </Menu.Item>
                                 <Menu.Item key="scholar-removed" className=" sub-menu">
                                    Transfer Property
@@ -184,10 +205,19 @@ class SideComponent extends Component {
                                 }
                             >
                                 
-                                <Menu.Item key="news-create" className="sub-menu">
-                                    View Report
+                                <Menu.Item key="property-list" className=" sub-menu" onClick={gotoPropertyList}>
+                                    Property
                                 </Menu.Item>
-                                <Menu.Item key="news-list" className="sub-menu">Print Report</Menu.Item>
+                                <Menu.Item key="client-list" className=" sub-menu" onClick={gotoClientList}>
+                                    Client
+                                </Menu.Item>
+                                <Menu.Item key="paymenttype-list" className=" sub-menu" onClick={gotoPaymentType}>
+                                    Payment Type
+                                </Menu.Item>
+                                <Menu.Item key="collections-list" className=" sub-menu" onClick={gotoIncome}>
+                                    Collections
+                                </Menu.Item>
+                                {/* <Menu.Item key="news-list" className="sub-menu">Print Report</Menu.Item> */}
                                 
                             </SubMenu>
                           

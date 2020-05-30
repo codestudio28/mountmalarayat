@@ -130,14 +130,18 @@ class PageContent extends Component {
                 status: item.status,
             })
         ));
+
+        console.log(dataProperty)
         const searchClient = () => {
             var i = 0;
             var fname = TodoStore.getSearchClient;
+            var clientid;
             dataSource.map((data, index) => {
                 if (data.name === fname) {
                     fullname = data.name;
                     contactnumber = data.contactnumber;
                     address = data.address;
+                    clientid=data.key;
                     i=1;
                 }
             })
@@ -147,10 +151,12 @@ class PageContent extends Component {
                 TodoStore.setDisplayName(fullname);
                 TodoStore.setDisplayContactNumber(contactnumber);
                 TodoStore.setDisplayAddress(address);
+                TodoStore.setClientId(clientid);
             }
           
         }
         const searchProperty = () => {
+            var propertyid;
             var block = TodoStore.getBlock;
             var lot = TodoStore.getLot;
             var misc;
@@ -163,10 +169,13 @@ class PageContent extends Component {
                     propstypes = data.type;
                     area = data.area;
                     price = data.price;
+                    propertyid=data.key;
+                    console.log(data.status)
                     dataType.map((datas, index) => {
                         if ((propstypes === datas.typename)) {
                             misc = datas.misc;
                             equity = datas.equity;
+                            
                             j=1;
                         }
                     })
@@ -182,6 +191,7 @@ class PageContent extends Component {
                 TodoStore.setDisplayTypes(propstypes);
                 TodoStore.setDisplayArea(area);
                 TodoStore.setDisplayPrice(price);
+                TodoStore.setPropertyId(propertyid);
             }
            
 
@@ -200,21 +210,176 @@ class PageContent extends Component {
             })
             const dateAmort =[];
             var tableamort='';
-        const computePayment = () => {
+         const computePayment = (value) => {
             var fullname = TodoStore.getDisplayName;
             var TCP = TodoStore.getDisplayPrice;
             var key = TodoStore.getDisplayPaymentScheme;
             var loanable = TodoStore.getLoanable;
             var reservationfee = TodoStore.getReservationFee;
-
+           
             if ((fullname.length === 0) || (TCP.length === 0) || (key.length === 0) || (loanable.length === 0) || (reservationfee.length === 0)) {
                 openNotification("Blank");
             } else {
-                var newTCP = TCP.replace(',', '');
-                var equitymonth = parseFloat(TodoStore.getEquityMonth);
                 var numyear = 0;
                 var schemename;
                 var percentage;
+
+                payment.map(item => {
+                    if (item._id === key)
+                        percentage = item.percentage;
+                    schemename = item.paymentname;
+                    numyear = item.numyear;
+                });
+                TodoStore.setFinance(schemename);
+                if(schemename==="In-House"){
+                    var newTCP = TCP.replace(',', '');
+                    var equitymonth = parseFloat(TodoStore.getEquityMonth);
+                    
+                    var misc = TodoStore.getMisc / 100;
+                   
+                    var newmisc = parseFloat(newTCP) * parseFloat(misc);
+                    var equity = parseFloat(newTCP) - parseFloat(loanable);
+                    var monthlymisc = (parseFloat(newmisc) / parseFloat(equitymonth)).toFixed(2);
+                    var newtotalequity = (parseFloat(equity));
+    
+                    var monthlyequity = (parseFloat(newtotalequity) / parseFloat(equitymonth)).toFixed(2);
+                    var formatter = new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'PHP',
+                    });
+                    TodoStore.setComputes(true);
+                    TodoStore.setMonthlyMisc(formatter.format(monthlymisc));
+                    TodoStore.setTotalMisc(formatter.format(newmisc));
+                    TodoStore.setMonthlyEquity(formatter.format(monthlyequity));
+                    TodoStore.setTotalEquity(formatter.format(equity));
+                    TodoStore.setNewTotalEquity(formatter.format(newtotalequity));
+                    TodoStore.setNewReservationFee(formatter.format(reservationfee));
+                    // payment.map(item => {
+                    //     if (item._id === key)
+                    //         percentage = item.percentage;
+                    //     schemename = item.paymentname;
+                    //     numyear = item.numyear;
+                    // });
+                    var totalamortization = parseFloat(newTCP) - parseFloat(equity);
+                    var monthlyamortization = parseFloat(totalamortization) * parseFloat(percentage).toFixed(2);
+                    var newtotalamortization = parseFloat(monthlyamortization) + parseFloat(monthlymisc);
+                    TodoStore.setTotalAmortization(formatter.format(newtotalamortization));
+                    TodoStore.setMonthlyAmortization(formatter.format(monthlyamortization));
+                    TodoStore.setNumberYears(numyear);
+                    TodoStore.setFinancing(schemename.toUpperCase());
+    
+                    var todays = TodoStore.getStartDate;    
+                    var days = 19;
+                    var dt = new Date(todays);
+                    dt.setMonth( dt.getMonth() + 1 );
+    
+                    var miscpenalty=0.05;
+                    var equitypenalty=0.05;
+    
+                    if(value==="Compute"){
+    
+                    }else{
+                        TodoStore.setAdding(true);
+                        var status1="ACTIVE";
+                        const amortization ={
+                            clientid : TodoStore.getClientId,
+                            propertyid : TodoStore.getPropertyId,
+                            amortmonths : equitymonth,
+                            financing : key,
+                            startdate : todays,
+                            reservation : reservationfee,
+                            totalmisc : newmisc,
+                            totalequity : equity,
+                            monthlymisc : monthlymisc,
+                            monthlyequity : monthlyequity,
+                            penaltymiscpercent : miscpenalty,
+                            penaltyequitypercent :equitypenalty,
+                            status : status1
+                        }
+                        var port = TodoStore.getPort;
+                        axios.post(port+'amortrouter/add', amortization)
+                            .then(res => {
+                                console.log(res.data);
+                                if (res.data === '202') {
+                                    TodoStore.setAdding(false);
+                                    openNotification("Exist");
+                                } else if (res.data === '101') {
+                                    openNotification("Success");
+                                    var id=TodoStore.getPropertyId;
+                                    const property = {
+                                        status: 'BOUGHT'
+                                    }
+                                    var port = TodoStore.getPort+"propertyrouter/status/"
+                                    axios.post(port + id, property)
+                                        .then(res => {
+                                            console.log(res.data);
+                                            if (res.data === '101') {
+                                                TodoStore.setAdding(false);
+                                                const equitypayment ={
+                                                    clientid :TodoStore.getClientId,
+                                                    propertyid : TodoStore.getPropertyId,
+                                                    paymentdate : todays,
+                                                    amorttype : 'E',
+                                                    amortamount : monthlyequity,
+                                                    amortpenalty :'',
+                                                    runningbalance : equity+"",
+                                                    payment2 :'',
+                                                    aror:'',
+                                                    paymenttype :'',
+                                                    chequenumber :'',
+                                                    bankname :'',
+                                                    branch:'',
+                                                    status :'NEW'
+    
+                                                }
+                                                const miscpayment ={
+                                                    clientid :TodoStore.getClientId,
+                                                    propertyid : TodoStore.getPropertyId,
+                                                    paymentdate : todays,
+                                                    amorttype : 'M',
+                                                    amortamount : monthlymisc,
+                                                    amortpenalty :'',
+                                                    runningbalance : newmisc+"",
+                                                    payment2 :'',
+                                                    aror:'',
+                                                    paymenttype :'',
+                                                    chequenumber :'',
+                                                    bankname :'',
+                                                    branch:'',
+                                                    status :'NEW'
+                                                }
+                                                console.log(equitypayment);
+                                                console.log(miscpayment);
+                                                var port = TodoStore.getPort;
+                                                axios.post(port+'paymentrouter/add', equitypayment)
+                                                    .then(res => {
+                                                        console.log(res.data);
+                                                    })
+                                                axios.post(port+'paymentrouter/add', miscpayment)
+                                                    .then(res => {
+                                                        console.log(res.data);
+                                                })
+    
+                                            } else {
+                                                TodoStore.setAdding(false);
+                                                openNotification("Server");
+                                            }
+                                    });
+                                  
+                                } else {
+                                    openNotification("Server");
+                                    TodoStore.setAdding(false);
+                                }
+                            });
+                  
+                    }
+
+
+
+                }else{
+                      var newTCP = TCP.replace(',', '');
+                var equitymonth = parseFloat(TodoStore.getEquityMonth);
+                
                 var misc = TodoStore.getMisc / 100;
                
                 var newmisc = parseFloat(newTCP) * parseFloat(misc);
@@ -234,12 +399,12 @@ class PageContent extends Component {
                 TodoStore.setTotalEquity(formatter.format(equity));
                 TodoStore.setNewTotalEquity(formatter.format(newtotalequity));
                 TodoStore.setNewReservationFee(formatter.format(reservationfee));
-                payment.map(item => {
-                    if (item._id === key)
-                        percentage = item.percentage;
-                    schemename = item.paymentname;
-                    numyear = item.numyear;
-                });
+                // payment.map(item => {
+                //     if (item._id === key)
+                //         percentage = item.percentage;
+                //     schemename = item.paymentname;
+                //     numyear = item.numyear;
+                // });
                 var totalamortization = parseFloat(newTCP) - parseFloat(equity);
                 var monthlyamortization = parseFloat(totalamortization) * parseFloat(percentage).toFixed(2);
                 var newtotalamortization = parseFloat(monthlyamortization) + parseFloat(monthlymisc);
@@ -248,67 +413,117 @@ class PageContent extends Component {
                 TodoStore.setNumberYears(numyear);
                 TodoStore.setFinancing(schemename.toUpperCase());
 
-            var todays = TodoStore.getStartDate;    
-            var days = 19;
-            var dt = new Date(todays);
-            dt.setMonth( dt.getMonth() + 1 );
-          
-            for(var x=0;x<parseInt(equitymonth);x++){
-                var days;
-                var dt;
-                // dt.setMonth( dt.getMonth() + 1 );
-                var years;
-                var months;
-                var newday;
-                var d;
-                var dayName;
-                var amortdate;
-            
-                if(x===0){
-                    todays = TodoStore.getStartDate;    
-                    days = 19;
-                    dt = new Date(todays);
-                    // dt.setMonth( dt.getMonth() + 1 );
-                    years = dt.getFullYear();
-                    months = dt.getMonth()+1;
-                    newday = years+"/"+months+"/"+days;
-                    d = new Date(newday);
-                    dayName = d.getDay();
-                    
-                    if(dayName===0){
-                        days=20;
-                    }else{
-                        days=19;
-                    }
-                     amortdate=years+"/"+months+"/"+days;
+                var todays = TodoStore.getStartDate;    
+                var days = 19;
+                var dt = new Date(todays);
+                dt.setMonth( dt.getMonth() + 1 );
+
+                var miscpenalty=0.05;
+                var equitypenalty=0.05;
+
+                if(value==="Compute"){
+
                 }else{
-                    todays = amortdate;    
-                    days = 19;
-                    dt = new Date(todays);
-                    dt.setMonth( dt.getMonth() + 1 );
-                    years = dt.getFullYear();
-                    months = dt.getMonth()+1;
-                    newday = years+"/"+months+"/"+days;
-                    d = new Date(newday);
-                    dayName = d.getDay();
-                    
-                    if(dayName===0){
-                        days=20;
-                    }else{
-                        days=19;
+                    TodoStore.setAdding(true);
+                    var status1="ACTIVE";
+                    const amortization ={
+                        clientid : TodoStore.getClientId,
+                        propertyid : TodoStore.getPropertyId,
+                        amortmonths : equitymonth,
+                        financing : key,
+                        startdate : todays,
+                        reservation : reservationfee,
+                        totalmisc : newmisc,
+                        totalequity : equity,
+                        monthlymisc : monthlymisc,
+                        monthlyequity : monthlyequity,
+                        penaltymiscpercent : miscpenalty,
+                        penaltyequitypercent :equitypenalty,
+                        status : status1
                     }
-                     amortdate=years+"/"+months+"/"+days;
+                    var port = TodoStore.getPort;
+                    axios.post(port+'amortrouter/add', amortization)
+                        .then(res => {
+                            console.log(res.data);
+                            if (res.data === '202') {
+                                TodoStore.setAdding(false);
+                                openNotification("Exist");
+                            } else if (res.data === '101') {
+                                openNotification("Success");
+                                var id=TodoStore.getPropertyId;
+                                const property = {
+                                    status: 'BOUGHT'
+                                }
+                                var port = TodoStore.getPort+"propertyrouter/status/"
+                                axios.post(port + id, property)
+                                    .then(res => {
+                                        console.log(res.data);
+                                        if (res.data === '101') {
+                                            TodoStore.setAdding(false);
+                                            const equitypayment ={
+                                                clientid :TodoStore.getClientId,
+                                                propertyid : TodoStore.getPropertyId,
+                                                paymentdate : todays,
+                                                amorttype : 'E',
+                                                amortamount : monthlyequity,
+                                                amortpenalty :'',
+                                                runningbalance : equity+"",
+                                                payment2 :'',
+                                                aror:'',
+                                                paymenttype :'',
+                                                chequenumber :'',
+                                                bankname :'',
+                                                branch:'',
+                                                status :'NEW'
+
+                                            }
+                                            const miscpayment ={
+                                                clientid :TodoStore.getClientId,
+                                                propertyid : TodoStore.getPropertyId,
+                                                paymentdate : todays,
+                                                amorttype : 'M',
+                                                amortamount : monthlymisc,
+                                                amortpenalty :'',
+                                                runningbalance : newmisc+"",
+                                                payment2 :'',
+                                                aror:'',
+                                                paymenttype :'',
+                                                chequenumber :'',
+                                                bankname :'',
+                                                branch:'',
+                                                status :'NEW'
+                                            }
+                                            console.log(equitypayment);
+                                            console.log(miscpayment);
+                                            var port = TodoStore.getPort;
+                                            axios.post(port+'paymentrouter/add', equitypayment)
+                                                .then(res => {
+                                                    console.log(res.data);
+                                                })
+                                            axios.post(port+'paymentrouter/add', miscpayment)
+                                                .then(res => {
+                                                    console.log(res.data);
+                                            })
+
+                                        } else {
+                                            TodoStore.setAdding(false);
+                                            openNotification("Server");
+                                        }
+                                });
+                              
+                            } else {
+                                openNotification("Server");
+                                TodoStore.setAdding(false);
+                            }
+                        });
+              
                 }
+                }
+
+
+              
                
-                dateAmort.push({
-                    id:x+1,
-                    dates:amortdate,
-                    equity:monthlyequity,
-                    mf:monthlymisc
-                });
             }
-            console.log(dateAmort);
-        }
         
 
         }
@@ -340,6 +555,24 @@ class PageContent extends Component {
                         console.log('Notification Clicked!');
                     },
                     icon: <Icon type='warning' style={{ color: '#faad14' }} />,
+                });
+            } else if (value === "Success") {
+                notification.open({
+                    message: 'Success',
+                    description: 'Successfully buy this property',
+                    onClick: () => {
+                        console.log('Notification Clicked!');
+                    },
+                    icon: <Icon type='success' style={{ color: '#faad14' }} />,
+                });
+            } else if (value === "Exist") {
+                notification.open({
+                    message: 'Warning',
+                    description: 'Property already assigned for this client',
+                    onClick: () => {
+                        console.log('Notification Clicked!');
+                    },
+                    icon: <Icon type='success' style={{ color: '#faad14' }} />,
                 });
             } 
         }
@@ -580,7 +813,7 @@ class PageContent extends Component {
                                                     backgroundColor: '#1890ff',
                                                     color: '#ffffff'
                                                 }}
-                                                    onClick={(event) => computePayment()}
+                                                    onClick={(event) => computePayment("Compute")}
                                                 >
                                                     Click to compute
                                                 </Button>
@@ -647,7 +880,16 @@ class PageContent extends Component {
                                                                         fontSize: '1em',
                                                                         color: '#8c8c8c',
                                                                         padding: '1em'
-                                                                    }}>Total Equity (Minus R.F.):</h4>
+                                                                    }}>
+                                                                        {TodoStore.getFinance==="In-House" &&
+                                                                           <span> Downpayment:</span>
+                                                                        }
+                                                                        {!TodoStore.getFinance==="In-House" &&
+                                                                            <span>Total Equity:</span>
+                                                                        }
+                                                                        
+                                                                        
+                                                                        </h4>
                                                                 </th>
                                                                 <th>
                                                                     <h4 style={{
@@ -665,7 +907,16 @@ class PageContent extends Component {
                                                                         fontSize: '1em',
                                                                         color: '#8c8c8c',
                                                                         padding: '1em'
-                                                                    }}>Monthly Equity:</h4>
+                                                                    }}>
+                                                                      {TodoStore.getFinance==="In-House" &&
+                                                                           <span>  Monthly Downpayment:</span>
+                                                                        }
+                                                                        {!TodoStore.getFinance==="In-House" &&
+                                                                            <span> Monthly Equity::</span>
+                                                                        }  
+                                                                       
+                                                                        
+                                                                    </h4>
                                                                 </th>
                                                                 <th>
                                                                     <h4 style={{
@@ -701,7 +952,34 @@ class PageContent extends Component {
                                                         </table>
 
                                                     </Col>
-                                                           
+                                                    <Col xs={12} md={12}
+                                                        style={{
+                                                            textAlign:'right',
+                                                            paddingRight:'1em'
+                                                        }}
+                                                    >
+                                                        {!TodoStore.getAdding &&
+                                                             <Popconfirm placement="topLeft" title={"Do you want to buy this property?"} onConfirm={(event) => computePayment("Save")} okText="Yes" cancelText="No">
+                                                                <Button style={{
+                                                                    backgroundColor: '#1890ff',
+                                                                    color: '#ffffff'
+                                                                }}
+                                                                >
+                                                                    Click to Buy
+                                                                </Button>
+                                                            </Popconfirm>
+                                                        }
+                                                        {TodoStore.getAdding &&
+                                                            <Button style={{
+                                                                backgroundColor: '#1890ff',
+                                                                color: '#ffffff'
+                                                            }}
+                                                            >
+                                                                Please wait.Saving ....
+                                                            </Button>
+                                                        }
+                                                   
+                                                    </Col>      
                                                 </React.Fragment>
                                             }
 

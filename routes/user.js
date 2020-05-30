@@ -60,6 +60,24 @@ router.route('/active').get((req, res) => {
         }
     });
 });
+// Get all active administrator
+router.route('/super').get((req, res) => {
+    const status='ACTIVE';
+    const usertypes='superadministrator';
+    Account.find({
+        status: status,
+        usertype:usertypes
+    }, (err, account) => {
+        if (err) {
+            return res.json('404');
+        } else if (account.length > 0) {
+            return res.json(account);
+
+        }else {
+            return res.json(account);
+        }
+    });
+});
 // Get All Administrator
 router.route('/').get((req, res) => {
     Account.find((err, account) => {

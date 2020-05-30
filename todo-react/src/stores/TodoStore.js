@@ -11,6 +11,9 @@ class TodoStore {
 // @observable port='http://192.241.154.210:8080/';
 @observable port='/api/';
 @observable loading=false;
+@observable datemodal=false;
+@observable voidmodalmisc=false;
+@observable voidmodaleqt=false;
 @observable ispassword=false;
 @observable accountimage='';
 @observable updateimage=false;git
@@ -86,6 +89,127 @@ class TodoStore {
 @observable startdate ='2019/01/01';
 @observable displaypaymentscheme ='Choose Payment Scheme';
 @observable amortization =[];
+@observable clientid ='';
+@observable propertyid ='';
+@observable paymenttype ='Cash';
+@observable payment ='';
+@observable bankcheque ='';
+@observable bankname ='';
+@observable bankbranch ='';
+@observable oreceipt ='';
+@observable areceipt ='';
+@observable penalty ='';
+@observable finance ='';
+@observable fromdate ='2017/01/01';
+@observable todate ='2045/01/01';
+@observable payee ='';
+@observable voucherdate ='';
+@observable amount ='';
+@observable cv ='';
+@observable checknumber ='';
+@observable terms ='';
+@observable explanation ='';
+@observable preparedby ='';
+@observable notedby ='';
+@observable approvedby ='';
+
+@action setPayee = (e) => {
+  this.payee=e.target.value;
+}
+@action setPayee2 = (value) => {
+  this.payee=value;
+}
+@action setAmount = (value) => {
+  this.amount=value;
+}
+@action setCV = (e) => {
+  this.cv=e.target.value;
+}
+@action setCV2 = (value) => {
+  this.cv=value;
+}
+@action setCheck = (e) => {
+  this.checknumber=e.target.value;
+}
+@action setCheck2 = (value) => {
+  this.checknumber=value;
+}
+@action setTerms = (e) => {
+  this.terms=e.target.value;
+}
+@action setTerms2 = (value) => {
+  this.terms=value;
+}
+@action setExplanation = (e) => {
+  this.explanation=e.target.value;
+}
+@action setExplanation2 = (value) => {
+  this.explanation=value;
+}
+@action setPreparedBy = (e) => {
+  this.preparedby=e.target.value;
+}
+@action setPreparedBy2 = (value) => {
+  this.preparedby=value;
+}
+@action setNotedBy = (e) => {
+  this.notedby=e.target.value;
+}
+@action setNotedBy2 = (value) => {
+  this.notedby=value;
+}
+@action setApprovedBy = (e) => {
+  this.approvedby=e.target.value;
+}
+@action setApprovedBy2 = (value) => {
+  this.approvedby=value;
+}
+@action setVoucherDate = (date,dateString) => {
+  this.voucherdate=dateString;
+}
+
+@action setDateFrom = (date,dateString) => {
+  this.fromdate=dateString;
+}
+@action setDateTo = (date,dateString) => {
+  this.todate=dateString;
+}
+@action setDateModal = (value) => {
+  this.datemodal=value;
+}
+@action setPenalty = (value) => {
+  this.penalty=value;
+}
+@action setFinance = (value) => {
+  this.finance=value;
+}
+@action setAReceipt = (e) => {
+  this.areceipt=e.target.value;
+}
+@action setOReceipt = (e) => {
+  this.oreceipt=e.target.value;
+}
+@action setBankName = (e) => {
+  this.bankname=e.target.value;
+}
+@action setBankBranch = (e) => {
+  this.bankbranch=e.target.value;
+}
+@action setBankCheque = (e) => {
+  this.bankcheque=e.target.value;
+}
+@action setPayment = (value) => {
+  this.payment=value;
+}
+@action setPaymentType = (value) => {
+  this.paymenttype=value;
+}
+@action setPropertyId = (value) => {
+  this.propertyid=value;
+}
+@action setClientId = (value) => {
+  this.clientid=value;
+}
 
 @action setAmortization = (id,dates,equity,mf) => {
     this.amortization.push({
@@ -261,6 +385,15 @@ class TodoStore {
 @action setUpdateModal = (value) => {
   this.updatemodal=value;
 }
+@action setVoidMiscModal = (value) => {
+  this.voidmodalmisc=value;
+}
+@action setVoidEqtModal = (value) => {
+  this.voidmodaleqt=value;
+}
+@action setUpdateModal = (value) => {
+  this.updatemodal=value;
+}
 @action setUpdateId = (value) => {
   this.updateid=value;
 }
@@ -291,8 +424,8 @@ class TodoStore {
 @action setArea = (e) => {
   this.area=e.target.value;
 }
-@action setPrice = (e) => {
-  this.price=e.target.value;
+@action setPrice = (value) => {
+  this.price=value;
 }
 @action setBlock2 = (value) => {
   this.block=value;
@@ -397,6 +530,9 @@ class TodoStore {
   this.addmodal=false;
   this.updatemodal=false;
   this.passwordmodal=false;
+  this.voidmodalmisc=false;
+  this.voidmodaleqt=false;
+  this.datemodal=false;
 }
 @action setFieldBlank = () => {
   this.firstname="";
@@ -419,6 +555,88 @@ class TodoStore {
 }
 
 // Computed
+@observable payee ='';
+@observable voucherdate ='';
+@observable amount ='';
+@observable cv ='';
+@observable checknumber ='';
+@observable terms ='';
+@observable explanation ='';
+@observable preparedby ='';
+@observable notedby ='';
+@observable approvedby ='';
+@computed get getVoucherDate(){
+  return this.voucherdate;
+}
+@computed get getPayee(){
+  return this.payee;
+}
+@computed get getAmount(){
+  return this.amount;
+}
+@computed get getCV(){
+  return this.cv;
+}
+@computed get getCheck(){
+  return this.checknumber;
+}
+@computed get getTerms(){
+  return this.terms;
+}
+@computed get getExplanation(){
+  return this.explanation;
+}
+@computed get getPreparedBy(){
+  return this.preparedby;
+}
+@computed get getNotedBy(){
+  return this.notedby;
+}
+@computed get getApprovedBy(){
+  return this.approvedby;
+}
+@computed get getDateTo(){
+  return this.todate;
+}
+@computed get getDateFrom(){
+  return this.fromdate;
+}
+@computed get getDateModal(){
+  return this.datemodal;
+}
+@computed get getFinance(){
+  return this.finance;
+}
+@computed get getPenalty(){
+  return this.penalty;
+}
+@computed get getAReceipt(){
+  return this.areceipt;
+}
+@computed get getOReceipt(){
+  return this.oreceipt;
+}
+@computed get getBankName(){
+  return this.bankname;
+}
+@computed get getBankBranch(){
+  return this.bankbranch;
+}
+@computed get getBankCheque(){
+  return this.bankcheque;
+}
+@computed get getPayment(){
+  return this.payment;
+}
+@computed get getPaymentType(){
+  return this.paymenttype;
+}
+@computed get getClientId(){
+  return this.clientid;
+}
+@computed get getPropertyId(){
+  return this.propertyid;
+}
 @computed get getAmortization(){
   return this.amortization;
 }
@@ -536,6 +754,12 @@ class TodoStore {
 }
 @computed get getUpdateModal(){
   return this.updatemodal;
+}
+@computed get getVoidMiscModal(){
+  return this.voidmodalmisc;
+}
+@computed get getVoidEqtModal(){
+  return this.voidmodaleqt;
 }
 @computed get getUpdateId(){
   return this.updateid;

@@ -40,6 +40,9 @@ const proptypeRouter = require('./routes/proptype');
 const paymentschemeRouter = require('./routes/paymentscheme');
 const messageRouter = require('./routes/message');
 const listingsRouter = require('./routes/listings');
+const amortRouter = require('./routes/amort');
+const paymentRouter = require('./routes/payment');
+const voucherRouter = require('./routes/voucher');
 
 // app.use('/accountrouter',userRouter);
 // app.use('/propertyrouter',propertyRouter);
@@ -48,6 +51,9 @@ const listingsRouter = require('./routes/listings');
 // app.use('/paymentschemerouter',paymentschemeRouter);
 // app.use('/messagerouter',messageRouter);
 // app.use('/listingsrouter',listingsRouter);
+// app.use('/amortrouter',amortRouter);
+// app.use('/paymentrouter',paymentRouter);
+// app.use('/voucherrouter',voucherRouter);
 
 app.use('/api/accountrouter',userRouter);
 app.use('/api/propertyrouter',propertyRouter);
@@ -56,7 +62,9 @@ app.use('/api/proptyperouter',proptypeRouter);
 app.use('/api/paymentschemerouter',paymentschemeRouter);
 app.use('/api/messagerouter',messageRouter);
 app.use('/api/listingsrouter',listingsRouter);
-
+app.use('/api/amortrouter',amortRouter);
+app.use('/api/paymentrouter',paymentRouter);
+app.use('/api/voucherrouter',voucherRouter);
 // 3
 // app.post('/profile', (req, res) => {
 //     if (req.files === null) {

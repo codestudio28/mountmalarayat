@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { Layout, Menu,Spin, Icon,InputNumber, Button, Avatar, Breadcrumb, Select, Pagination, Modal, Checkbox, notification, Tooltip, Popconfirm } from 'antd';
 import { Container, Row, Col } from 'react-bootstrap';
 import './content.css';
@@ -67,7 +69,16 @@ class PageContent extends Component {
         const dataSource = [];
         const dataType = [];
 
-        items.map(item => (
+        items.map((item) => {
+            var status="";
+
+            if(item.status==="NEW"){
+                status="AVAILABLE";
+            }else if(item.status==="BOUGHT"){
+                status="OCCUPIED";
+            }else{
+                status="REMOVED";
+            }
                 dataSource.push({
                     key: item._id,
                     block: item.block,
@@ -75,10 +86,10 @@ class PageContent extends Component {
                     type: item.type,
                     area: item.area,
                     price: item.price,
-                    status: item.status,
+                    status:status,
 
                 })
-            ));
+        });
         
             types.map(item => (
                 dataType.push({
@@ -86,6 +97,7 @@ class PageContent extends Component {
                    typename: item.typename,
                     description: item.description,
                     equity: item.equity,
+                    misc: item.misc,
                     status: item.status,
 
                 })
@@ -302,6 +314,23 @@ class PageContent extends Component {
             .map((data, index) => {
                 i++;
                 if ((index >= starts) && (index < ends)) {
+                    var mf=0;
+                    var misc=0;
+                    dataType.map((records=>{
+                        if(data.type===records.typename){
+                            mf = records.misc;
+                            
+                        }
+                    }))
+                    var newTCP = data.price.replace(',', '');
+                    misc = parseFloat(newTCP)*(parseFloat(mf)/100);
+                    var stat="";
+
+                   
+                    var formatter = new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'PHP',
+                    });
                     if(data.status === "REMOVED"){
                         
                     }else{
@@ -309,47 +338,15 @@ class PageContent extends Component {
                             return (
                         
                                 <tr key={i}>
-                                    <td>{i}</td>
+                                    <td>{i}.</td>
                                     <td>{data.block}</td>
                                     <td>{data.lot}</td>
                                     <td>{data.type}</td>
                                     <td>{data.area} sqm.</td>
                                     <td>Php. {data.price}</td>
+                                    <td>{formatter.format(misc)}</td>
                                     <td>{data.status}</td>
-                                    <td>
-                                    {!TodoStore.getLoading &&
-                                        <ButtonGroup>
-                                            <Tooltip placement="topLeft" title="Click to update property information">
-                                                <Button style={{ backgroundColor: '#00a2ae' }}
-                                                    onClick={(event) => setUpdate(data.key)}
-                                                ><Icon type="edit" style={{ color: '#fff', fontSize: '1.25em' }}></Icon></Button>
-                                            </Tooltip>
-                                            <Tooltip placement="topLeft" title="Click to remove this property">
-                                                <Popconfirm
-                                                    placement="topRight"
-                                                    title="Do you want to remove this property?"
-                                                    onConfirm={removeProperty}
-                                                    okText="Yes"
-                                                    cancelText="No"
-                                                >
-                                                    <Button style={{ backgroundColor: '#ff4d4f' }} onClick={(event) => TodoStore.setRemoveId(data.key)}><Icon type="delete" style={{ color: '#fff', fontSize: '1.25em' }}></Icon></Button>
-                                                </Popconfirm>
-                                            </Tooltip>
-                                        </ButtonGroup>
-                                    }
-                                     {TodoStore.getLoading &&
-                                        <div style={{fontSize:'1em',
-                                        backgroundColor:'#a0d911',
-                                        height:'2em',
-                                        borderRadius:'0.5em',
-                                        width:'12em',
-                                        textAlign:'center',
-                                        padding:'0.25em',
-                                        color:'#ffffff'}}>
-                                        Loading... Please wait.
-                                    </div>
-                                     }
-                                    </td>
+                                   
                                 </tr>
                             )
                         }else {
@@ -412,6 +409,22 @@ class PageContent extends Component {
                     
                 }
             })
+            const generatePDF = () => {
+                const doc = new jsPDF();
+                var todays = new Date().toLocaleString();
+                // doc.fromHTML('Mount Malarayat Property Development Corporation', 10, 10)
+                var pageHeight= doc.internal.pageSize.height;
+                console.log(pageHeight);
+                doc.fromHTML('<h4>MOUNT MALARAYAT PROPERTY DEVELOPMENT CORPORATION</h4>',40,10);
+                doc.fromHTML('<h5>List of Property Units</h5>',90,20);
+                doc.fromHTML('<h6>Date Generated: '+todays+'</h6>',145,27);
+                    // autoTable(doc, { html: '#property-table' })
+                doc.autoTable({ 
+                    html: '#property-table',
+                    margin:{top:40} })
+                    doc.save(todays+'.pdf')
+            }
+
         return (
 
             <React.Fragment>
@@ -433,9 +446,9 @@ class PageContent extends Component {
                                         <Row>
                                             <Col xs={12} md={12} style={{ textAlign: 'right' }}>
                                                 <Button type="primary"
-                                                    onClick={(event) => TodoStore.setAddModal(true)}
+                                                    onClick={(event) => generatePDF()}
                                                 >
-                                                    Add Property
+                                                    Generate PDF
                                                 </Button>
                                             </Col>
                                             <Col xs={12} md={4} style={{ paddingTop: '0.5em' }}>
@@ -494,7 +507,7 @@ class PageContent extends Component {
                                             <Col xs={12} md={12} style={{ paddingTop: '0.5em' }}>
 
                                                 {sizes === 0 &&
-                                                    <table className="table table-hover" style={{ width: '100%' }}>
+                                                    <table id="property-table" className="table table-hover" style={{ width: '100%' }}>
                                                         <thead>
                                                             <tr>
                                                                 <th>#</th>
@@ -502,9 +515,9 @@ class PageContent extends Component {
                                                                 <th>Lot</th>
                                                                 <th>Type</th>
                                                                 <th>Area</th>
-                                                                <th>Price</th>
+                                                                <th>TCP</th>
+                                                                <th>MF</th>
                                                                 <th>Status</th>
-                                                                <th>Action</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>

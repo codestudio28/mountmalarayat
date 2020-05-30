@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { Layout, Menu, Badge, Icon, Spin, Button, Avatar, Breadcrumb, Select, Pagination, Modal, Checkbox, notification, Tooltip, Popconfirm } from 'antd';
 import { Container, Row, Col } from 'react-bootstrap';
 import './content.css';
@@ -30,6 +32,7 @@ class PageContent extends Component {
             property:[],
             amort:[],
             financing:[],
+            payment:[],
             isloaded: false,
         }
     }
@@ -43,6 +46,13 @@ class PageContent extends Component {
                     client: json,
                 })
             });
+        fetch(port + 'paymentrouter/')
+            .then(res => res.json())
+            .then(json => {
+                this.setState({
+                    payment: json,
+                })
+        });
         fetch(port + 'propertyrouter/')
             .then(res => res.json())
             .then(json => {
@@ -76,7 +86,7 @@ class PageContent extends Component {
     }
     render() {
         const TodoStore = this.props.TodoStore;
-        var { isloaded, client, sizes, property, amort,financing, type } = this.state;
+        var { isloaded, client, sizes, property, amort,financing, type,payment } = this.state;
 
         const dataSource = [];
         const dataProperty = [];
@@ -151,8 +161,15 @@ class PageContent extends Component {
             var lastname;
             var block;
             var lot;
+            var tcp;
             var financingname;
             var financingyear;
+            var equity_runningbalance;
+            var misc_runningbalance;
+            var equity_penalty;
+            var misc_penalty;
+            var del=0;
+            var stats="GOOD CLIENTS";
             client.map((item2) => {
                 if(item.clientid===item2._id){
                     firstname = item2.firstname;
@@ -163,6 +180,7 @@ class PageContent extends Component {
                 if(item.propertyid===item3._id){
                     block = item3.block;
                     lot = item3.lot;
+                    tcp=item3.price;
                 }
             })
 
@@ -172,16 +190,44 @@ class PageContent extends Component {
                     financingyear = item4.numyear;
                 }
             })
-            
+            payment.map((item5)=>{
+                if((item.clientid===item5.clientid)&&(item.propertyid===item5.propertyid)){
+                    if((item5.status==="VOID")||(item5.status==="UNPAID")){
+                        del++;
+                    }
+                    if(item5.amorttype==="E"){
+                        equity_runningbalance=item5.runningbalance;
+                        equity_penalty=item5.amortpenalty;
+                    }else{
+                        misc_runningbalance=item5.runningbalance;
+                        misc_penalty=item5.amortpenalty;
+                    }
+                }
+            })
+
+            if(del>0){
+                stats="DELIQUENT CLIENTS";
+            }else{
+                stats="GOOD CLIENTS";
+            }
             dataSource.push({
                 key: item._id,
                 fullname: firstname+" "+lastname,
-                address: "Block "+block+" Lot "+lot,
-                financingname:financingname,
-                financingyear:financingyear
+                block: block,
+                lot:lot,
+                tcp:tcp,
+                equity:item.totalequity,
+                misc:item.totalmisc,
+                equity_balance:equity_runningbalance,
+                misc_balance:misc_runningbalance,
+                equity_penalty:equity_penalty,
+                misc_penalty:misc_penalty,
+                financing:financingname,
+                reservation:item.reservation,
+                status:stats
             })
         });
-
+        console.log(dataSource);
         const setView =(value)=>{
             window.open("/payment/"+value,"_self");
         }
@@ -194,6 +240,10 @@ class PageContent extends Component {
         ends = parseInt(page) * parseInt(numberdisplay);
         starts = ends - parseInt(numberdisplay);
 
+        var formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'PHP',
+        });
 
         const datalist = dataSource.filter(data => {
            
@@ -201,10 +251,12 @@ class PageContent extends Component {
                 return data.fullname.indexOf(TodoStore.search) >= 0
             } else if (TodoStore.filter === 'Client Name') {
                 return data.fullname.indexOf(TodoStore.search) >= 0
-            } else if (TodoStore.filter === 'Address') {
-                return data.address.indexOf(TodoStore.search) >= 0
+            } else if (TodoStore.filter === 'Block') {
+                return data.block.indexOf(TodoStore.search) >= 0
+            } else if (TodoStore.filter === 'Lot') {
+                return data.lot.indexOf(TodoStore.search) >= 0
             } else if (TodoStore.filter === 'Financing') {
-                return data.Financing.indexOf(TodoStore.search) >= 0
+                return data.financing.indexOf(TodoStore.search) >= 0
             } 
 
         })
@@ -216,36 +268,15 @@ class PageContent extends Component {
                         return (
 
                             <tr key={i}>
-                                <td>{i}</td>
+                                <td>{i}.</td>
                                 <td>{data.fullname} </td>
-                                <td>{data.address}</td>
-                                <td>{data.financingname}, {data.financingyear} years</td>
-                                <td>
-                                    <Button style={{ backgroundColor: '#00a2ae' }}
-                                                    onClick={(event) => setView(data.key)}>
-                                        <Icon type="eye" style={{ color: '#fff', fontSize: '1.25em' }}></Icon>
-                                    </Button>
-                                        {/* <ButtonGroup>
-                                            <Tooltip placement="topLeft" title="Click to update client information">
-                                                <Button style={{ backgroundColor: '#00a2ae' }}
-                                                    onClick={(event) => setUpdate(data.key)}
-                                                ><Icon type="edit" style={{ color: '#fff', fontSize: '1.25em' }}></Icon></Button>
-                                            </Tooltip>
-                                            <Tooltip placement="topLeft" title="Click to remove this client">
-                                                <Popconfirm
-                                                    placement="topRight"
-                                                    title="Do you want to remove this client?"
-                                                    onConfirm={removeClient}
-                                                    okText="Yes"
-                                                    cancelText="No"
-                                                >
-                                                    <Button style={{ backgroundColor: '#ff4d4f' }} onClick={(event) => TodoStore.setRemoveId(data.key)}><Icon type="delete" style={{ color: '#fff', fontSize: '1.25em' }}></Icon></Button>
-                                                </Popconfirm>
-                                            </Tooltip>
-                                        </ButtonGroup> */}
-                                    
-                                    
-                                </td>
+                                <td>{data.block}</td>
+                                <td>{data.lot}</td>
+                                <td>{formatter.format(data.tcp)}</td>
+                                <td>{formatter.format(data.equity_balance)}</td>
+                                <td>{formatter.format(data.misc_balance)}</td>
+                                <td>{formatter.format(data.reservation)}</td>
+                                <td>{data.financing}</td>
                             </tr>
                         )
                     }else{
@@ -254,6 +285,21 @@ class PageContent extends Component {
 
                 }
             })
+            const generatePDF = () => {
+                const doc = new jsPDF("landscape");
+                var todays = new Date().toLocaleString();
+                // doc.fromHTML('Mount Malarayat Property Development Corporation', 10, 10)
+                var pageHeight= doc.internal.pageSize.height;
+                console.log(pageHeight);
+                doc.fromHTML('<h4>MOUNT MALARAYAT PROPERTY DEVELOPMENT CORPORATION</h4>',90,10);
+                doc.fromHTML('<h5>List of Client (FINANCING TYPE)</h5>',130,20);
+                doc.fromHTML('<h6>Date Generated: '+todays+'</h6>',220,27);
+                    // autoTable(doc, { html: '#property-table' })
+                doc.autoTable({ 
+                    html: '#table-client',
+                    margin:{top:40} })
+                doc.save(todays+'.pdf')
+            }
         return (
 
             <React.Fragment>
@@ -273,8 +319,16 @@ class PageContent extends Component {
                                         }}
                                     >
                                         <Row>
+                                        <Col xs={12} md={12} style={{ textAlign: 'right' }}>
+                                                <Button type="primary"
+                                                    onClick={(event) => generatePDF()}
+                                                >
+                                                    Generate PDF
+                                                </Button>
+                                                </Col>
                                             <Col xs={12} md={4} style={{ paddingTop: '0.5em' }}>
                                                 <Row>
+                                                
                                                     <Col xs={12} md={12}>
                                                         <h5 style={{ color: '#c4c4c4', fontSize: '1em' }}>Filter by:</h5>
                                                     </Col>
@@ -283,9 +337,9 @@ class PageContent extends Component {
                                                             onChange={TodoStore.setFilter}>
                                                             <Option value="All">All</Option>
                                                             <Option value="Client Name">Client Name</Option>
-                                                            <Option value="Address">Address</Option>
-                                                            <Option value="Financing">Financing</Option>
-                                                            
+                                                            <Option value="Block">Block</Option>
+                                                            <Option value="Lot">Lot</Option>
+                                                            <Option value="Financing">Financing Type</Option>
                                                         </Select>
                                                     </Col>
                                                 </Row>
@@ -328,14 +382,18 @@ class PageContent extends Component {
                                             <Col xs={12} md={12} style={{ paddingTop: '0.5em' }}>
 
                                                
-                                                    <table className="table table-hover" style={{ width: '100%' }}>
+                                                    <table id="table-client" className="table table-hover" style={{ width: '100%' }}>
                                                         <thead>
                                                             <tr>
                                                                 <th>#</th>
-                                                                <th>Client Name</th>
-                                                                <th>Property Address</th>
-                                                                <th>Financing</th>
-                                                                <th>Action</th>
+                                                                <th>CLIENT's NAME</th>
+                                                                <th>BLOCK</th>
+                                                                <th>LOT</th>
+                                                                <th>TCP</th>
+                                                                <th>EQ BALANCE</th>
+                                                                <th>MF BALANCE</th>
+                                                                <th>RESERVATION FEE</th>
+                                                                <th>FINANCING TYPE</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>

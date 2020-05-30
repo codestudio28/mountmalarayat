@@ -18,8 +18,15 @@ import AccountInfo from './components/Admin/Account/AccountInformation/PageLayou
 import ChangePassword from './components/Admin/Account/ChangePassword/PageLayout';
 import Listings from './components/Admin/Listings/ListListings/PageLayout';
 import Buy from './components/Admin/Transaction/Buy/PageLayout';
+import Payment from './components/Admin/Transaction/Payment/PageLayout';
+import Payable from './components/Admin/Transaction/Payable/PageLayout';
+import SinglePayment from './components/Admin/Transaction/Payment/Index';
 import Home from './components/Public/Home/Home';
 import Inquiry from './components/Public/Inquiry/Home';
+import ReportProperty from './components/Admin/Report/ListProperty/PageLayout';
+import ReportClient from './components/Admin/Report/ListClient/PageLayout';
+import ReportPaymentType from './components/Admin/Report/PaymentType/PageLayout';
+import ReportIncome from './components/Admin/Report/Income/PageLayout';
 function App() {
 
   return (
@@ -40,8 +47,15 @@ function App() {
           <Route path="/account" exact component={AccountInfo}></Route>
           <Route path="/account/password" exact component={ChangePassword}></Route>
           <Route path="/buy" exact component={Buy}></Route>
+          <Route path="/payment" exact component={Payment}></Route>
+          <Route path="/payable" exact component={Payable}></Route>
           <Route path="/inquire" exact component={Inquiry}></Route>
           <Route path="/listings" exact component={Listings}></Route>
+          <Route path="/property-report" exact component={ReportProperty}></Route>
+          <Route path="/client-report" exact component={ReportClient}></Route>
+          <Route path="/paymenttype-report" exact component={ReportPaymentType}></Route>
+          <Route path="/collection-report" exact component={ReportIncome}></Route>
+          <Route path="/payment/:id" exact component={SinglePayment}></Route>
         </Switch>
     </Router>
   );
