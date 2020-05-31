@@ -16,6 +16,7 @@ const paymentSchema = new Schema({
     chequenumber:{type:String},
     bankname:{type:String},
     branch:{type:String},
+    datepaid:{type:String},
     status:{type:String},
 },{
     timestamps:true,

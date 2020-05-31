@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import './sidecomponent.css';
 import { Menu, Icon } from 'antd';
 import { inject, observer} from 'mobx-react';
+import { reactLocalStorage } from 'reactjs-localstorage';
 import {
     BrowserRouter as Router,
     Switch,
@@ -76,6 +77,9 @@ class SideComponent extends Component {
         const gotoPayable=()=>{
             window.open("/payable","_self");
         }
+        const gotoLogs=()=>{
+            window.open("/list-log","_self");
+        }
         return (
            
             <React.Fragment>
@@ -116,7 +120,7 @@ class SideComponent extends Component {
                                    Buy Property
                                 </Menu.Item>
                                 <Menu.Item key="scholar-current" className="sub-menu"  onClick={gotoPayment}>
-                                    Payment
+                                    Collections
                                 </Menu.Item>
                                 <Menu.Item key="scholar-current" className="sub-menu"  onClick={gotoPayable}>
                                     Account's Payable
@@ -160,23 +164,26 @@ class SideComponent extends Component {
                                    Removed Property
                                 </Menu.Item>
                             </SubMenu>
-                            <SubMenu
-                                className="sub-menu"
-                                key="admin"
-                                title={
-                                    <span>
-                                        <Icon type="font-colors" />
-                                        <span className="sub-menu">Administrator</span>
-                                    </span>
-                                }
-                            >
-                                <Menu.Item key="user-list" className=" sub-menu" onClick={gotoAdministrator}>
-                                    List of Administrator
-                                </Menu.Item>
-                                <Menu.Item key="user-removed" className=" sub-menu" onClick={gotoRemovedAdministrator}>
-                                    Removed Administrator
-                                </Menu.Item>
-                            </SubMenu>
+                            { reactLocalStorage.get('usertype')=="superadministrator" &&
+                                  <SubMenu
+                                  className="sub-menu"
+                                  key="admin"
+                                  title={
+                                      <span>
+                                          <Icon type="font-colors" />
+                                          <span className="sub-menu">Administrator</span>
+                                      </span>
+                                  }
+                              >
+                                  <Menu.Item key="user-list" className=" sub-menu" onClick={gotoAdministrator}>
+                                      List of Administrator
+                                  </Menu.Item>
+                                  <Menu.Item key="user-removed" className=" sub-menu" onClick={gotoRemovedAdministrator}>
+                                      Removed Administrator
+                                  </Menu.Item>
+                              </SubMenu>
+                            }
+                          
                             <SubMenu
                                 className="sub-menu"
                                 key="user"
@@ -217,6 +224,11 @@ class SideComponent extends Component {
                                 <Menu.Item key="collections-list" className=" sub-menu" onClick={gotoIncome}>
                                     Collections
                                 </Menu.Item>
+                                { reactLocalStorage.get('usertype')=="superadministrator" &&
+                                     <Menu.Item key="logs-list" className=" sub-menu" onClick={gotoLogs}>
+                                     Logs
+                                    </Menu.Item>
+                                }
                                 {/* <Menu.Item key="news-list" className="sub-menu">Print Report</Menu.Item> */}
                                 
                             </SubMenu>

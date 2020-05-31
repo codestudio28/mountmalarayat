@@ -180,6 +180,8 @@ class PageContent extends Component {
             })
 
             if((item.amorttype=="E")&&(item.status=="PAID")){
+                var payments;
+               
                 dataPaymentEquity.push({
                     clientid:item.clientid,
                     propertyid:item.propertyid,
@@ -323,15 +325,27 @@ class PageContent extends Component {
             .map((data, index) => {
                 
                 i++;
-               
+                var miscs=0;
+                var eqts=0;
                 if ((index >= starts) && (index < ends)) {
                     if (sizes === 0) {
                         if((data.paymentdate>=TodoStore.getDateFrom)&&(data.paymentdate<=TodoStore.getDateTo)){
                            
                             count++;
-                        alltotal=alltotal+(parseFloat(data.misc)+parseFloat(data.equity));
-                        equitytotal=equitytotal+parseFloat(data.equity);
-                        misctotal=misctotal+parseFloat(data.misc);
+
+                           if(data.misc===undefined){
+                                miscs=0.00;
+                           }else{
+                               miscs=data.misc;
+                           } 
+                           if(data.equity===undefined){
+                            eqts=0.00;
+                       }else{
+                           eqts=data.equity;
+                       } 
+                        alltotal=alltotal+(parseFloat(miscs)+parseFloat(eqts));
+                        equitytotal=equitytotal+parseFloat(eqts);
+                        misctotal=misctotal+parseFloat(miscs);
                         return (
 
                             <tr key={count}>
@@ -340,9 +354,9 @@ class PageContent extends Component {
                                 <td>{data.fullname} </td>
                                 <td>{data.block}</td>
                                 <td>{data.lot}</td>
-                                <td>{formatter.format(data.equity)}</td>
-                                <td>{formatter.format(data.misc)}</td>
-                                <td>{formatter.format(parseFloat(data.misc)+parseFloat(data.equity))}</td>
+                                <td>{formatter.format(eqts)}</td>
+                                <td>{formatter.format(miscs)}</td>
+                                <td>{formatter.format(parseFloat(miscs)+parseFloat(eqts))}</td>
                                 
                             </tr>
                         )
@@ -383,7 +397,7 @@ class PageContent extends Component {
                 <Container fluid={true} style={{ minHeight: '40em', height: 'auto', marginTop: '1em', backgroundColor: '#eeeeee' }}>
                     <Row>
                         <Col xs={12} md={12}>
-                            <BreadCrumb location="Transaction / List of Transactions" />
+                            <BreadCrumb location="Reports / List of Collections" />
                         </Col>
                         <Col xs={12} md={12} style={{ padding: '1em' }}>
                             <div style={{ padding: '1em', backgroundColor: '#fff', minHeight: '1em' }}>

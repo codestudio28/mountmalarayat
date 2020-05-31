@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Layout, Menu, Spin, Icon, InputNumber, Button, Avatar, Breadcrumb, Select, Pagination, Modal, Checkbox, notification, Tooltip, Popconfirm } from 'antd';
 import { Container, Row, Col } from 'react-bootstrap';
+import { reactLocalStorage } from 'reactjs-localstorage';
 import './content.css';
 import { Input } from 'antd';
 import { inject, observer } from 'mobx-react';
@@ -57,6 +58,36 @@ class PageContent extends Component {
 
         const dataSource = [];
 
+        const addSystemLog=(process,logs)=>{
+            //logss
+            var d = new Date();
+            var year = d.getFullYear();
+            var month = d.getMonth();
+            var day = d.getDate();
+            var today = year+"-"+month+"-"+day;
+            var hours = d.getHours();
+            var minutes = d.getMinutes();
+            var seconds = d.getSeconds();
+            var currenttime = hours+":"+minutes+":"+seconds;
+            var datetime=today+" "+currenttime;
+            var email = reactLocalStorage.get('useremail');
+            const userlog ={
+                clientid :email,
+                process:process,
+                datetimes:datetime,
+                dates:today,
+                times:currenttime,
+                logs:logs,
+                status:'UNREAD'
+            }
+            var port = TodoStore.getPort;
+            axios.post(port+'systemlogrouter/add', userlog)
+            .then(res => {
+                console.log(res.data);
+            })
+            
+        }
+
         items.map(item => (
             dataSource.push({
                 key: item._id,
@@ -107,6 +138,9 @@ class PageContent extends Component {
                             getPropertyType();
                             TodoStore.setAdding(false);
                             TodoStore.setHandleCancel();
+                            var process = "Add Data";
+                            var logs="Add property type to the system";
+                            addSystemLog(process,logs);
                         } else {
                             openNotification("Server");
                             TodoStore.setAdding(false);
@@ -152,6 +186,9 @@ class PageContent extends Component {
                             getPropertyType();
                             TodoStore.setAdding(false);
                             TodoStore.setHandleCancel();
+                            var process = "Update Data";
+                            var logs="Update property type in the system";
+                            addSystemLog(process,logs);
                         } else {
                             TodoStore.setAdding(false);
                             openNotification("Server");
@@ -173,6 +210,9 @@ class PageContent extends Component {
                         TodoStore.setLoading(false);
                         getPropertyType();
                         openNotification("Removed");
+                        var process = "Remove Data";
+                            var logs="Remove property type in the system";
+                            addSystemLog(process,logs);
                     } else {
                         TodoStore.setLoading(false);
                         openNotification("Server");
@@ -599,8 +639,10 @@ class PageContent extends Component {
                                             <h4 style={{ color: '#c4c4c4', fontSize: '1em' }}>Equity</h4>
                                         </Col>
                                         <Col xs={12} md={12} >
-                                            <Input placeholder="Enter equity *(Required)"
-                                                onChange={TodoStore.setEquity}
+                                            <InputNumber 
+                                                style={{width:'100%'}}
+                                                placeholder="Enter equity *(Required)"
+                                                onChange={TodoStore.setEquity2}
                                                 value={TodoStore.getEquity}
                                             />
                                         </Col>
@@ -608,8 +650,10 @@ class PageContent extends Component {
                                             <h4 style={{ color: '#c4c4c4', fontSize: '1em' }}>Miscellaneous Fee</h4>
                                         </Col>
                                         <Col xs={12} md={12} >
-                                            <Input placeholder="Enter miscellaneous fee *(Required)"
-                                                onChange={TodoStore.setMisc}
+                                            <InputNumber 
+                                                style={{width:'100%'}}
+                                                placeholder="Enter miscellaneous fee *(Required)"
+                                                onChange={TodoStore.setMisc2}
                                                 value={TodoStore.getMisc}
                                             />
                                         </Col>
@@ -669,8 +713,10 @@ class PageContent extends Component {
                                             <h4 style={{ color: '#c4c4c4', fontSize: '1em' }}>Equity</h4>
                                         </Col>
                                         <Col xs={12} md={12} >
-                                            <Input placeholder="Enter equity *(Required)"
-                                                onChange={TodoStore.setEquity}
+                                            <InputNumber 
+                                                style={{width:'100%'}}
+                                                placeholder="Enter equity *(Required)"
+                                                onChange={TodoStore.setEquity2}
                                                 value={TodoStore.getEquity}
                                             />
                                         </Col>
@@ -678,8 +724,10 @@ class PageContent extends Component {
                                             <h4 style={{ color: '#c4c4c4', fontSize: '1em' }}>Miscellaneous Fee</h4>
                                         </Col>
                                         <Col xs={12} md={12} >
-                                            <Input placeholder="Enter miscellaneous fee *(Required)"
-                                                onChange={TodoStore.setMisc}
+                                            <InputNumber 
+                                                style={{width:'100%'}}
+                                                placeholder="Enter miscellaneous fee *(Required)"
+                                                onChange={TodoStore.setMisc2}
                                                 value={TodoStore.getMisc}
                                             />
                                         </Col>

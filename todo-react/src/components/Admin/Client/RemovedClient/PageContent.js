@@ -7,7 +7,7 @@ import { Input } from 'antd';
 import { inject, observer } from 'mobx-react';
 import axios from "axios";
 import BreadCrumb from '../../BreadCrumb';
-
+import { reactLocalStorage } from 'reactjs-localstorage';
 
 
 const { Search } = Input;
@@ -57,6 +57,36 @@ class PageContent extends Component {
 
         const dataSource = [];
 
+        const addSystemLog=(process,logs)=>{
+            //logss
+            var d = new Date();
+            var year = d.getFullYear();
+            var month = d.getMonth();
+            var day = d.getDate();
+            var today = year+"-"+month+"-"+day;
+            var hours = d.getHours();
+            var minutes = d.getMinutes();
+            var seconds = d.getSeconds();
+            var currenttime = hours+":"+minutes+":"+seconds;
+            var datetime=today+" "+currenttime;
+            var email = reactLocalStorage.get('useremail');
+            const userlog ={
+                clientid :email,
+                process:process,
+                datetimes:datetime,
+                dates:today,
+                times:currenttime,
+                logs:logs,
+                status:'UNREAD'
+            }
+            var port = TodoStore.getPort;
+            axios.post(port+'systemlogrouter/add', userlog)
+            .then(res => {
+                console.log(res.data);
+            })
+            
+        }
+
         items.filter(item => {
             return item.status.indexOf("REMOVED") >= 0
         })
@@ -102,6 +132,9 @@ class PageContent extends Component {
                         TodoStore.setLoading(false);
                         getClient();
                         openNotification("Retrieved");
+                        var process = "Retrieve Data";
+                        var logs="Retrieve client to the system";
+                        addSystemLog(process,logs);
                     } else {
                         TodoStore.setLoading(false);
                         openNotification("Server");

@@ -8,6 +8,7 @@ import { Input } from 'antd';
 import { inject, observer } from 'mobx-react';
 import axios from "axios";
 import BreadCrumb from '../../BreadCrumb';
+import { reactLocalStorage } from 'reactjs-localstorage';
 
 
 
@@ -84,6 +85,38 @@ class PageContent extends Component {
     render() {
         const TodoStore = this.props.TodoStore;
         var { isloaded, client, sizes, property, payment, type } = this.state;
+
+
+
+        const addSystemLog=(process,logs)=>{
+            //logss
+            var d = new Date();
+            var year = d.getFullYear();
+            var month = d.getMonth();
+            var day = d.getDate();
+            var today = year+"-"+month+"-"+day;
+            var hours = d.getHours();
+            var minutes = d.getMinutes();
+            var seconds = d.getSeconds();
+            var currenttime = hours+":"+minutes+":"+seconds;
+            var datetime=today+" "+currenttime;
+            var email = reactLocalStorage.get('useremail');
+            const userlog ={
+                clientid :email,
+                process:process,
+                datetimes:datetime,
+                dates:today,
+                times:currenttime,
+                logs:logs,
+                status:'UNREAD'
+            }
+            var port = TodoStore.getPort;
+            axios.post(port+'systemlogrouter/add', userlog)
+            .then(res => {
+                console.log(res.data);
+            })
+            
+        }
 
         const dataSource = [];
         const dataProperty = [];
@@ -309,12 +342,14 @@ class PageContent extends Component {
                                     const property = {
                                         status: 'BOUGHT'
                                     }
+
                                     var port = TodoStore.getPort+"propertyrouter/status/"
                                     axios.post(port + id, property)
                                         .then(res => {
                                             console.log(res.data);
                                             if (res.data === '101') {
                                                 TodoStore.setAdding(false);
+                                             
                                                 const equitypayment ={
                                                     clientid :TodoStore.getClientId,
                                                     propertyid : TodoStore.getPropertyId,
@@ -326,6 +361,7 @@ class PageContent extends Component {
                                                     payment2 :'',
                                                     aror:'',
                                                     paymenttype :'',
+                                                    datepaid :'',
                                                     chequenumber :'',
                                                     bankname :'',
                                                     branch:'',
@@ -343,6 +379,7 @@ class PageContent extends Component {
                                                     payment2 :'',
                                                     aror:'',
                                                     paymenttype :'',
+                                                    datepaid :'',
                                                     chequenumber :'',
                                                     bankname :'',
                                                     branch:'',
@@ -359,7 +396,9 @@ class PageContent extends Component {
                                                     .then(res => {
                                                         console.log(res.data);
                                                 })
-    
+                                                var process = "Assign Property-Client";
+                                                var logs="Assign propperty to client";
+                                                addSystemLog(process,logs);
                                             } else {
                                                 TodoStore.setAdding(false);
                                                 openNotification("Server");
@@ -471,6 +510,7 @@ class PageContent extends Component {
                                                 payment2 :'',
                                                 aror:'',
                                                 paymenttype :'',
+                                                datepaid :'',
                                                 chequenumber :'',
                                                 bankname :'',
                                                 branch:'',
@@ -488,6 +528,7 @@ class PageContent extends Component {
                                                 payment2 :'',
                                                 aror:'',
                                                 paymenttype :'',
+                                                datepaid :'',
                                                 chequenumber :'',
                                                 bankname :'',
                                                 branch:'',
@@ -504,7 +545,9 @@ class PageContent extends Component {
                                                 .then(res => {
                                                     console.log(res.data);
                                             })
-
+                                            var process = "Assign Property-Client";
+                                            var logs="Assign propperty to client";
+                                            addSystemLog(process,logs);
                                         } else {
                                             TodoStore.setAdding(false);
                                             openNotification("Server");

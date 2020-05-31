@@ -108,6 +108,18 @@ router.route('/update/:id').post((req,res) =>{
       .catch(err => res.status(400).json('Error: '+ err))
 });
 
+// update administrator
+router.route('/password/:id').post((req,res) =>{
+    Account.findById(req.params.id)
+      .then(account => {
+        account.password = req.body.password;
+        account.save()
+                  .then(() => res.json('101'))
+                  .catch(err => res.status(400).json('Error: ' + err))
+      })
+      .catch(err => res.status(400).json('Error: '+ err))
+});
+
 
 // update administrator profile
 router.route('/update/profile/:id').post((req,res) =>{

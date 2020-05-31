@@ -16,9 +16,10 @@ router.route('/add').post((req, res) => {
     const chequenumber = req.body.chequenumber;
     const bankname = req.body.bankname;
     const branch = req.body.branch;
+    const datepaid = req.body.datepaid;
     const status = req.body.status;
 
-    console.log(payment2);
+   
     Payment.find({
         clientid: clientid,
         propertyid:propertyid,
@@ -43,6 +44,7 @@ router.route('/add').post((req, res) => {
                 paymenttype,
                 chequenumber,
                 bankname,
+                datepaid,
                 branch,
                 status,
             });
@@ -79,6 +81,7 @@ router.route('/updatenewmisc/:id').post((req,res) =>{
       .then(payment => {
         payment.runningbalance = req.body.runningbalance;
         payment.amortpenalty = req.body.amortpenalty;
+        
         payment.save()
                   .then(() => res.json('101'))
                   .catch(err => res.status(400).json('Error: ' + err))
@@ -93,6 +96,7 @@ router.route('/updateneweqt/:id').post((req,res) =>{
       .then(payment => {
         payment.runningbalance = req.body.runningbalance;
         payment.amortpenalty = req.body.amortpenalty;
+      
         payment.save()
                   .then(() => res.json('101'))
                   .catch(err => res.status(400).json('Error: ' + err))
@@ -150,7 +154,7 @@ router.route('/update/:id').post((req,res) =>{
         payment.paymenttype = req.body.paymenttype;
         payment.aror = req.body.aror;
         payment.status = req.body.status;
-
+        payment.datepaid = req.body.datepaid;
         payment.save()
                   .then(() => res.json('101'))
                   .catch(err => res.status(400).json('Error: ' + err))
@@ -170,7 +174,7 @@ router.route('/updates/:id').post((req,res) =>{
         payment.bankname= req.body.bankname;
         payment.branch= req.body.bankbranch;
         payment.status = req.body.status;
-
+        payment.datepaid = req.body.datepaid;
         payment.save()
                   .then(() => res.json('101'))
                   .catch(err => res.status(400).json('Error: ' + err))

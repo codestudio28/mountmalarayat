@@ -43,6 +43,7 @@ const listingsRouter = require('./routes/listings');
 const amortRouter = require('./routes/amort');
 const paymentRouter = require('./routes/payment');
 const voucherRouter = require('./routes/voucher');
+const systemlogRouter = require('./routes/systemlog');
 
 // app.use('/accountrouter',userRouter);
 // app.use('/propertyrouter',propertyRouter);
@@ -54,6 +55,7 @@ const voucherRouter = require('./routes/voucher');
 // app.use('/amortrouter',amortRouter);
 // app.use('/paymentrouter',paymentRouter);
 // app.use('/voucherrouter',voucherRouter);
+// app.use('/systemlogrouter',systemlogRouter);
 
 app.use('/api/accountrouter',userRouter);
 app.use('/api/propertyrouter',propertyRouter);
@@ -65,6 +67,7 @@ app.use('/api/listingsrouter',listingsRouter);
 app.use('/api/amortrouter',amortRouter);
 app.use('/api/paymentrouter',paymentRouter);
 app.use('/api/voucherrouter',voucherRouter);
+app.use('/api/systemlogrouter',systemlogRouter);
 // 3
 // app.post('/profile', (req, res) => {
 //     if (req.files === null) {

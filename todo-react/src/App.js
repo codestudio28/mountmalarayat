@@ -27,6 +27,7 @@ import ReportProperty from './components/Admin/Report/ListProperty/PageLayout';
 import ReportClient from './components/Admin/Report/ListClient/PageLayout';
 import ReportPaymentType from './components/Admin/Report/PaymentType/PageLayout';
 import ReportIncome from './components/Admin/Report/Income/PageLayout';
+import ReportListLog from './components/Admin/Report/ListLog/PageLayout';
 function App() {
 
   return (
@@ -55,6 +56,7 @@ function App() {
           <Route path="/client-report" exact component={ReportClient}></Route>
           <Route path="/paymenttype-report" exact component={ReportPaymentType}></Route>
           <Route path="/collection-report" exact component={ReportIncome}></Route>
+          <Route path="/list-log" exact component={ReportListLog}></Route>
           <Route path="/payment/:id" exact component={SinglePayment}></Route>
         </Switch>
     </Router>

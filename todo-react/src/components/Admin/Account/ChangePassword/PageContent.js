@@ -94,11 +94,10 @@ class PageContent extends Component {
                 if (reactLocalStorage.get('oldpassword') === TodoStore.getOldPassword) {
                     let id = reactLocalStorage.get('userid');
                     const account = {
-                        oldpassword: TodoStore.getOldPassword,
                         password: TodoStore.getPassword
 
                     }
-                    var port = TodoStore.getPort+'accountrouter/update/';
+                    var port = TodoStore.getPort+'accountrouter/password/';
                     axios.post(port + id, account)
                         .then(res => {
                             if (res.data === '202') {

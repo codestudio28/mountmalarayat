@@ -145,7 +145,7 @@ class PageContent extends Component {
 
             }
         }
-
+        
         amort.map((item) => {
             var firstname;
             var lastname;
@@ -210,7 +210,7 @@ class PageContent extends Component {
         })
             .map((data, index) => {
                 i++;
-
+               
                 if ((index >= starts) && (index < ends)) {
                     if (sizes === 0) {
                         return (
@@ -254,6 +254,7 @@ class PageContent extends Component {
 
                 }
             })
+       
         return (
 
             <React.Fragment>
@@ -261,7 +262,7 @@ class PageContent extends Component {
                 <Container fluid={true} style={{ minHeight: '40em', height: 'auto', marginTop: '1em', backgroundColor: '#eeeeee' }}>
                     <Row>
                         <Col xs={12} md={12}>
-                            <BreadCrumb location="Transaction / List of Transactions" />
+                            <BreadCrumb location="Transaction / Collections" />
                         </Col>
                         <Col xs={12} md={12} style={{ padding: '1em' }}>
                             <div style={{ padding: '1em', backgroundColor: '#fff', minHeight: '1em' }}>

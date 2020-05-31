@@ -2,32 +2,120 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Chart } from "react-google-charts";
+import { inject, observer } from 'mobx-react';
+import axios from "axios";
 
-
+var month_0="";
+var month_1="";
+var month_2="";
+var month_3="";
+var month_4="";
+var month_5="";
+var month_6="";
+var month_7="";
+var month_8="";
+var month_9="";
+var month_10="";
+var month_11="";
+var todayyear="";
+@inject('TodoStore')
+@observer
 class Collections extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+        sizes: 0,
+        payment: [],
+        isloaded: false,
+    }
+  }
+  componentDidMount() {
+    const TodoStore = this.props.TodoStore;
+    var port = TodoStore.getPort;
+    var port = TodoStore.getPort;
+    fetch(port + 'paymentrouter/')
+    .then(res => res.json())
+    .then(json => {
+        this.setState({
+            payment: json,
+        })
+});
+      
 
+  }
     render() {
-        
-        const weekcollection = {
-            'Week1':8175000,
-            'Week2':3792000,
-            'Week3':2695000,
-            'Week4':2099000,
+      const TodoStore = this.props.TodoStore;
+      var { isloaded,sizes,payment } = this.state;
+      const dataSource = [];
+      const dataMonth = [];
+
+      var today = new Date();
+      todayyear = today.getFullYear();
+     
+      var x=0;
+      for(x=0;x<12;x++){
+        var collections=0;
+        var mon;
+        payment.map((item)=>{
+          if(item.datepaid!==""){
+            var today = new Date();
+            var year = today.getFullYear();
+              var d = new Date(item.datepaid);
+              var n = d.getMonth();
+              var years = d.getFullYear();
+            if((x===n)&&(years===year)){
+                  collections=parseFloat(collections)+parseFloat(item.payment2);
+                  console.log(x+":"+collections);
+                  
+            }
+            mon=x;
+          }
+        })
+        if(mon===0){
+          month_0=collections.toFixed(2);
+        }else if(mon===1){
+          month_1=collections.toFixed(2);
+        }else if(mon===2){
+          month_2=collections.toFixed(2);
+        }else if(mon===3){
+          month_3=collections.toFixed(2);
+        }else if(mon===4){
+          month_4=collections.toFixed(2);
+        }else if(mon===5){
+          month_5=collections.toFixed(2);
+        }else if(mon===6){
+          month_6=collections.toFixed(2);
+        }else if(mon===7){
+          month_7=collections.toFixed(2);
+        }else if(mon===8){
+          month_8=collections.toFixed(2);
+        }else if(mon===9){
+          month_9=collections.toFixed(2);
+        }else if(mon===10){
+          month_10=collections.toFixed(2);
+        }else if(mon===1){
+          month_11=collections.toFixed(2);
         }
+      }
+     
+         
+      
+
         const monthlycollection = {
-            'January':8175000,
-            'February':3792000,
-            'March':2695000,
-            'April':2099000,
-            'May':8175000,
-            'June':3792000,
-            'July':2695000,
-            'August':2099000,
-            'September':8175000,
-            'October':3792000,
-            'November':2695000,
-            'December':2099000,
+            'January':month_0,
+            'February':month_1,
+            'March':month_2,
+            'April':month_3,
+            'May':month_4,
+            'June':month_5,
+            'July':month_6,
+            'August':month_7,
+            'September':month_8,
+            'October':month_9,
+            'November':month_10,
+            'December':month_11,
         }
+        console.log(monthlycollection);
         const yearcollection = {
             'A':28175000,
             'B':33792000,
@@ -36,39 +124,8 @@ class Collections extends Component {
 
         return (
             <React.Fragment>
-                 <Col xs={12} md={4} style={{ padding: '1em',minHeight:'10em',height:'auto' }}>
-                     <Row>
-                       
-                        <Col xs={12} md={12}>
-                        <Chart
-                            width={'100%'}
-                            height={'300px'}
-                            chartType="BarChart"
-                            loader={<div>Loading weekly collections...</div>}
-                            data={[
-                                ['Week', 'January'],
-                                ['Week 1',parseInt(`${weekcollection.Week1}`)],
-                                ['Week 2', parseInt(`${weekcollection.Week2}`)],
-                                ['Week 3', parseInt(`${weekcollection.Week3}`)],
-                                ['Week 4', parseInt(`${weekcollection.Week4}`)],
-                              ]}
-                              options={{
-                                title: 'Weekly Collections',
-                                chartArea: { width: '50%' },
-                                hAxis: {
-                                  title: 'Collections',
-                                  minValue: 0,
-                                },
-                                vAxis: {
-                                  title: 'Weeks',
-                                },
-                              }}
-                            rootProps={{ 'data-testid': '1' }}
-                            />
-                        </Col>
-                     </Row>
-                 </Col>
-                 <Col xs={12} md={4} style={{ padding: '1em' }}>
+                 
+                 <Col xs={12} md={6} style={{ padding: '1em' }}>
                      <Row>
                        
                         <Col xs={12} md={12}>
@@ -78,7 +135,7 @@ class Collections extends Component {
                             chartType="BarChart"
                             loader={<div>Loading monthly collections...</div>}
                             data={[
-                                ['Month', '2020'],
+                                ['Month', `${todayyear}`],
                                 ['January',parseInt(`${monthlycollection.January}`)],
                                 ['February', parseInt(`${monthlycollection.February}`)],
                                 ['March', parseInt(`${monthlycollection.March}`)],
@@ -108,7 +165,7 @@ class Collections extends Component {
                         </Col>
                      </Row>
                  </Col>
-                 <Col xs={12} md={4} style={{ padding: '1em' }}>
+                 <Col xs={12} md={6} style={{ padding: '1em' }}>
                      <Row>
                         
                         <Col xs={12} md={12}>

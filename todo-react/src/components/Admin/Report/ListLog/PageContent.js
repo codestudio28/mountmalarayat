@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Layout, Menu, Spin, Icon, InputNumber, Button, Avatar, Breadcrumb, Select, Pagination, Modal, Checkbox, notification, Tooltip, Popconfirm } from 'antd';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { Layout, Menu,Spin, Icon,InputNumber, Button, Avatar, Breadcrumb, Select, Pagination, Modal, Checkbox, notification, Tooltip, Popconfirm } from 'antd';
 import { Container, Row, Col } from 'react-bootstrap';
 import './content.css';
 import { Input } from 'antd';
 import { inject, observer } from 'mobx-react';
 import axios from "axios";
 import BreadCrumb from '../../BreadCrumb';
-import { reactLocalStorage } from 'reactjs-localstorage';
+
 
 
 const { Search } = Input;
@@ -18,7 +20,7 @@ const ButtonGroup = Button.Group;
 const { Option } = Select;
 
 var i = 0;
-
+var count=0;
 @inject('TodoStore')
 @observer
 class PageContent extends Component {
@@ -27,13 +29,14 @@ class PageContent extends Component {
         this.state = {
             sizes: 0,
             items: [],
+            types: [],
             isloaded: false,
         }
     }
     componentDidMount() {
         const TodoStore = this.props.TodoStore;
         var port = TodoStore.getPort;
-        fetch(port + 'propertyrouter/')
+        fetch(port+'systemlogrouter/')
             .then(res => res.json())
             .then(json => {
                 this.setState({
@@ -41,6 +44,7 @@ class PageContent extends Component {
                     items: json,
                 })
             });
+           
         window.addEventListener("resize", this.resize.bind(this));
         this.resize();
     }
@@ -53,93 +57,27 @@ class PageContent extends Component {
     }
     render() {
         const TodoStore = this.props.TodoStore;
-        var { isloaded, items, sizes } = this.state;
+        var { isloaded, items, sizes,types } = this.state;
 
         const dataSource = [];
+        const dataType = [];
 
-        const addSystemLog=(process,logs)=>{
-            //logss
-            var d = new Date();
-            var year = d.getFullYear();
-            var month = d.getMonth();
-            var day = d.getDate();
-            var today = year+"-"+month+"-"+day;
-            var hours = d.getHours();
-            var minutes = d.getMinutes();
-            var seconds = d.getSeconds();
-            var currenttime = hours+":"+minutes+":"+seconds;
-            var datetime=today+" "+currenttime;
-            var email = reactLocalStorage.get('useremail');
-            const userlog ={
-                clientid :email,
-                process:process,
-                datetimes:datetime,
-                dates:today,
-                times:currenttime,
-                logs:logs,
-                status:'UNREAD'
-            }
-            var port = TodoStore.getPort;
-            axios.post(port+'systemlogrouter/add', userlog)
-            .then(res => {
-                console.log(res.data);
-            })
+        items.map((item) => {
+                dataSource.push({
+                    key: item._id,
+                    user: item.clientid,
+                    datetimes: item.datetimes,
+                    dates: item.dates,
+                    process: item.process,
+                    logs: item.logs
+                })
+        });
+        
             
-        }
 
-        items.filter(item => {
-            return item.status.indexOf("REMOVED") >= 0
-        }).map(item => (
-            dataSource.push({
-                key: item._id,
-                block: item.block,
-                lot: item.lot,
-                type: item.type,
-                area: item.area,
-                price: item.price,
-                status: item.status,
-
-            })
-        ));
-
-        const getProperty = () => {
-
-            var port = TodoStore.getPort;
-            fetch(port + 'propertyrouter/')
-                .then(res => res.json())
-                .then(json => {
-                    this.setState({
-                        isloaded: true,
-                        items: json,
-                    })
-                });
-        }
-
-        const removeProperty = () => {
-            var id = TodoStore.getRemoveId;
-            const client = {
-                status: 'NEW'
-            }
-            TodoStore.setLoading(true);
-            var port = TodoStore.getPort;
-            axios.post(port + 'propertyrouter/status/' + id, client)
-                .then(res => {
-                    console.log(res.data);
-                    if (res.data === '101') {
-
-                        getProperty();
-                        TodoStore.setLoading(false);
-                        openNotification("Retrieved");
-                        var process = "Retrieve Data";
-                        var logs="Retrieve property to the system";
-                        addSystemLog(process,logs);
-                    } else {
-
-                        openNotification("Server");
-                        TodoStore.setLoading(false);
-                    }
-                });
-        }
+        
+       
+     
         const openNotification = (value) => {
             if (value === "Blank") {
                 notification.open({
@@ -200,20 +138,10 @@ class PageContent extends Component {
                 });
 
             }
-            else if (value === "Retrieved") {
-                notification.open({
-                    message: 'Success',
-                    description: 'Successfully retrieved property.',
-                    onClick: () => {
-                        console.log('Notification Clicked!');
-                    },
-                    icon: <Icon type='check' style={{ color: '#52c41a' }} />,
-                });
-
-            }
         }
 
         i = 0;
+        count=0;
         var starts = 0;
         var ends = 0;
         var numberdisplay = TodoStore.getNumberDisplay;
@@ -221,125 +149,67 @@ class PageContent extends Component {
         ends = parseInt(page) * parseInt(numberdisplay);
         starts = ends - parseInt(numberdisplay);
 
-
+        const propertype = dataType.filter(data => {
+            return data;
+        })
+        .map((data, index) => {
+            return(
+            <Option value={data.typename}>{data.typename}</Option>
+            )
+        })
+        dataSource.sort((a, b) => b.dates.localeCompare(a.dates));
         const datalist = dataSource.filter(data => {
 
             if (TodoStore.filter === 'All') {
-                return data.block.indexOf(TodoStore.search) >= 0
-            } else if (TodoStore.filter === 'Block') {
-                return data.block.indexOf(TodoStore.search) >= 0
-            } else if (TodoStore.filter === 'Lot') {
-                return data.lot.indexOf(TodoStore.search) >= 0
-            } else if (TodoStore.filter === 'Area') {
-                return data.area.indexOf(TodoStore.search) >= 0
-            } else if (TodoStore.filter === 'Type') {
-                return data.type.indexOf(TodoStore.search) >= 0
-            } else if (TodoStore.filter === 'Status') {
-                return data.status.indexOf(TodoStore.search) >= 0
-            }
+                return data.user.indexOf(TodoStore.search) >= 0
+            } else if (TodoStore.filter === 'Email') {
+                return data.user.indexOf(TodoStore.search) >= 0
+            } else if (TodoStore.filter === 'Process') {
+                return data.process.indexOf(TodoStore.search) >= 0
+            } else if (TodoStore.filter === 'Date') {
+                return data.dates.indexOf(TodoStore.search) >= 0
+            } 
 
         })
             .map((data, index) => {
                 i++;
                 if ((index >= starts) && (index < ends)) {
-                    if (sizes === 0) {
-                        return (
-
-                            <tr key={i}>
-                                <td>{i}</td>
-                                <td>{data.block}</td>
-                                <td>{data.lot}</td>
-                                <td>{data.type}</td>
-                                <td>{data.area} sqm.</td>
-                                <td>Php. {data.price}</td>
-                                <td>{data.status}</td>
-                                <td>
-                                    {!TodoStore.getLoading &&
-                                        <ButtonGroup>
-                                            <Tooltip placement="topLeft" title="Click to retrieve this property">
-                                                <Popconfirm
-                                                    placement="topRight"
-                                                    title="Do you want to retrieve this property?"
-                                                    onConfirm={removeProperty}
-                                                    okText="Yes"
-                                                    cancelText="No"
-                                                >
-                                                    <Button style={{ backgroundColor: '#722ed1' }} onClick={(event) => TodoStore.setRemoveId(data.key)}><Icon type="interaction" style={{ color: '#fff', fontSize: '1.25em' }}></Icon></Button>
-                                                </Popconfirm>
-                                            </Tooltip>
-                                        </ButtonGroup>
-                                    }
-                                    {TodoStore.getLoading &&
-                                        <div style={{
-                                            fontSize: '1em',
-                                            backgroundColor: '#a0d911',
-                                            height: '2em',
-                                            borderRadius: '0.5em',
-                                            width: '12em',
-                                            textAlign: 'center',
-                                            padding: '0.25em',
-                                            color: '#ffffff'
-                                        }}>
-                                            Loading... Please wait.
-                                    </div>
-                                    }
-                                </td>
-                            </tr>
-                        )
-                    } else {
-                        return (
-
-                            <Col key={data.key} xs={12} md={12} style={{
-                                backgroundColor: '#bae7ff',
-                                height: 'auto',
-                                marginTop: '0.5em',
-                                minHeight: '5em',
-                                padding: '1em 0.5em 1em 0.5em',
-                                borderRadius: '0.5em'
-                            }}>
-                                <Row >
-                                    <Col xs={12} md={12}>
-                                        <h4 style={{ fontSize: '1em' }}><span style={{ color: '#8c8c8c' }}>Block:</span> {data.block}&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: '#8c8c8c' }}>Lot: </span>{data.lot}</h4>
-                                    </Col>
-                                    <Col xs={12} md={12}>
-                                        <h4 style={{ fontSize: '1em' }}><span style={{ color: '#8c8c8c' }}>Type:</span> {data.type}&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: '#8c8c8c' }}>Area:</span> {data.area}</h4>
-                                    </Col>
-                                    <Col xs={12} md={12}>
-                                        <h4 style={{ fontSize: '1em' }}><span style={{ color: '#8c8c8c' }}>Price:</span> {data.price}&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color: '#8c8c8c' }}>Status: </span>{data.status}</h4>
-                                    </Col>
-                                    <Col xs={12} md={12} >
-                                        <div style={{ borderTop: '1px solid', width: '100%' }}>
-
-                                        </div>
-                                    </Col>
-                                    <Col xs={12} md={12} style={{ textAlign: 'right', paddingTop: '0.5em' }}>
-                                        {!TodoStore.getLoading &&
-                                            <ButtonGroup>
-                                                <Tooltip placement="topLeft" title="Click to retrieve this property">
-                                                    <Popconfirm
-                                                        placement="topRight"
-                                                        title="Do you want to retrieve this property?"
-                                                        onConfirm={removeProperty}
-                                                        okText="Yes"
-                                                        cancelText="No"
-                                                    >
-                                                        <Button style={{ backgroundColor: '#722ed1' }} onClick={(event) => TodoStore.setRemoveId(data.key)}><Icon type="interaction" style={{ color: '#fff', fontSize: '1.25em' }}></Icon></Button>
-                                                    </Popconfirm>
-                                                </Tooltip>
-                                            </ButtonGroup>
-                                        }
-                                        {TodoStore.getLoading &&
-                                            <Spin />
-                                        }
-                                    </Col>
-                                </Row>
-                            </Col>
-                        )
+                   
+                     
+                            count++;
+                            return (
+                        
+                                <tr key={i}>
+                                    <td>{count}</td>
+                                    <td>{data.dates}</td>
+                                    <td>{data.user}</td>
+                                    <td>{data.process}</td>
+                                    <td>{data.logs}</td>
+                                   
+                                </tr>
+                            )
+                        
+                       
                     }
-
-
-                }
+                    
+                
             })
+            const generatePDF = () => {
+                const doc = new jsPDF();
+                var todays = new Date().toLocaleString();
+                // doc.fromHTML('Mount Malarayat Property Development Corporation', 10, 10)
+                var pageHeight= doc.internal.pageSize.height;
+                console.log(pageHeight);
+                doc.fromHTML('<h4>MOUNT MALARAYAT PROPERTY DEVELOPMENT CORPORATION</h4>',40,10);
+                doc.fromHTML('<h5>List of User Logs</h5>',90,20);
+                doc.fromHTML('<h6>Date Generated: '+todays+'</h6>',145,27);
+                    // autoTable(doc, { html: '#property-table' })
+                doc.autoTable({ 
+                    html: '#property-table',
+                    margin:{top:40} })
+                    doc.save(todays+'.pdf')
+            }
+
         return (
 
             <React.Fragment>
@@ -347,7 +217,7 @@ class PageContent extends Component {
                 <Container fluid={true} style={{ minHeight: '40em', height: 'auto', marginTop: '1em', backgroundColor: '#eeeeee' }}>
                     <Row>
                         <Col xs={12} md={12}>
-                            <BreadCrumb location="Property / List of Removed Property" />
+                            <BreadCrumb location="Report / List of Logs" />
                         </Col>
                         <Col xs={12} md={12} style={{ padding: '1em' }}>
                             <div style={{ padding: '1em', backgroundColor: '#fff', minHeight: '1em' }}>
@@ -359,7 +229,13 @@ class PageContent extends Component {
                                         }}
                                     >
                                         <Row>
-
+                                            <Col xs={12} md={12} style={{ textAlign: 'right' }}>
+                                                <Button type="primary"
+                                                    onClick={(event) => generatePDF()}
+                                                >
+                                                    Generate PDF
+                                                </Button>
+                                            </Col>
                                             <Col xs={12} md={4} style={{ paddingTop: '0.5em' }}>
                                                 <Row>
                                                     <Col xs={12} md={12}>
@@ -373,6 +249,7 @@ class PageContent extends Component {
                                                             <Option value="Lot">Lot</Option>
                                                             <Option value="Type">Type</Option>
                                                             <Option value="Area">Area</Option>
+                                                            <Option value="Status">Status</Option>
                                                         </Select>
                                                     </Col>
                                                 </Row>
@@ -415,17 +292,14 @@ class PageContent extends Component {
                                             <Col xs={12} md={12} style={{ paddingTop: '0.5em' }}>
 
                                                 {sizes === 0 &&
-                                                    <table className="table table-hover" style={{ width: '100%' }}>
+                                                    <table id="property-table" className="table table-hover" style={{ width: '100%' }}>
                                                         <thead>
                                                             <tr>
                                                                 <th>#</th>
-                                                                <th>Block</th>
-                                                                <th>Lot</th>
-                                                                <th>Type</th>
-                                                                <th>Area</th>
-                                                                <th>Price</th>
-                                                                <th>Status</th>
-                                                                <th>Action</th>
+                                                                <th>Date</th>
+                                                                <th>Email</th>
+                                                                <th>Process</th>
+                                                                <th>Logs</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -435,7 +309,7 @@ class PageContent extends Component {
 
                                                 }
 
-                                                    {sizes !== 0 &&
+                                                {sizes !== 0 &&
                                                     <Col xs={12} md={12} style={{ paddingTop: '0.5em' }}>
                                                         <Row>
                                                             {datalist}
@@ -455,7 +329,7 @@ class PageContent extends Component {
                             </div>
                         </Col>
                     </Row>
-
+                  
                 </Container>
 
 

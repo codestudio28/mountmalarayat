@@ -8,6 +8,8 @@ import { inject, observer } from 'mobx-react';
 import axios from "axios";
 import BreadCrumb from '../../BreadCrumb';
 
+import { reactLocalStorage } from 'reactjs-localstorage';
+
 
 
 const { Search } = Input;
@@ -64,10 +66,50 @@ class PageContent extends Component {
         const TodoStore = this.props.TodoStore;
         var { isloaded, items, sizes,types } = this.state;
 
+        const addSystemLog=(process,logs)=>{
+            //logss
+            var d = new Date();
+            var year = d.getFullYear();
+            var month = d.getMonth();
+            var day = d.getDate();
+            var today = year+"-"+month+"-"+day;
+            var hours = d.getHours();
+            var minutes = d.getMinutes();
+            var seconds = d.getSeconds();
+            var currenttime = hours+":"+minutes+":"+seconds;
+            var datetime=today+" "+currenttime;
+            var email = reactLocalStorage.get('useremail');
+            const userlog ={
+                clientid :email,
+                process:process,
+                datetimes:datetime,
+                dates:today,
+                times:currenttime,
+                logs:logs,
+                status:'UNREAD'
+            }
+            var port = TodoStore.getPort;
+            axios.post(port+'systemlogrouter/add', userlog)
+            .then(res => {
+                console.log(res.data);
+            })
+            
+        }
+    
+
         const dataSource = [];
         const dataType = [];
 
-        items.map(item => (
+        items.map((item) => {
+            var stats;
+
+            if(item.status==="REMOVED"){
+                stats="REMOVED";
+            }else if(item.status==="NEW"){
+                stats="AVAILABLE";
+            }else if(item.status==="BOUGHT"){
+                stats="OCCUPIED";
+            }
                 dataSource.push({
                     key: item._id,
                     block: item.block,
@@ -75,10 +117,10 @@ class PageContent extends Component {
                     type: item.type,
                     area: item.area,
                     price: item.price,
-                    status: item.status,
+                    status:stats,
 
                 })
-            ));
+    });
         
             types.map(item => (
                 dataType.push({
@@ -130,6 +172,9 @@ class PageContent extends Component {
                             getProperty();
                             TodoStore.setAdding(false);
                             TodoStore.setHandleCancel();
+                            var process = "Add Data";
+                            var logs="Add new property in the system";
+                            addSystemLog(process,logs);
                         } else {
                             openNotification("Server");
                             TodoStore.setAdding(false);
@@ -177,6 +222,9 @@ class PageContent extends Component {
                             getProperty();
                             TodoStore.setAdding(false);
                             TodoStore.setHandleCancel();
+                            var process = "Update Data";
+                            var logs="Update property information in the system";
+                            addSystemLog(process,logs);
                         } else {
                             TodoStore.setAdding(false);
                             openNotification("Server");
@@ -198,6 +246,9 @@ class PageContent extends Component {
                         TodoStore.setLoading(false);
                         getProperty();
                         openNotification("Removed");
+                        var process = "Remove Data";
+                        var logs="Remove property in the system";
+                        addSystemLog(process,logs);
                     } else {
                         TodoStore.setLoading(false);
                         openNotification("Server");
@@ -419,7 +470,7 @@ class PageContent extends Component {
                 <Container fluid={true} style={{ minHeight: '40em', height: 'auto', marginTop: '1em', backgroundColor: '#eeeeee' }}>
                     <Row>
                         <Col xs={12} md={12}>
-                            <BreadCrumb location="Client / List of Property" />
+                            <BreadCrumb location="Property / List of Property" />
                         </Col>
                         <Col xs={12} md={12} style={{ padding: '1em' }}>
                             <div style={{ padding: '1em', backgroundColor: '#fff', minHeight: '1em' }}>

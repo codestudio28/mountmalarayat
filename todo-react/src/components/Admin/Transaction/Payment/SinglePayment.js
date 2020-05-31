@@ -4,6 +4,7 @@ import { Layout, Menu, Badge, Icon, Spin, Button, Avatar, Breadcrumb, Select, Pa
 import { Container, Row, Col } from 'react-bootstrap';
 import './content.css';
 import { Input,InputNumber } from 'antd';
+import { reactLocalStorage } from 'reactjs-localstorage';
 import { inject, observer } from 'mobx-react';
 import axios from "axios";
 import BreadCrumb from '../../BreadCrumb';
@@ -324,7 +325,7 @@ class SinglePayment extends Component {
                                                              {finance==="In-House" &&
                                                                 <span>Total Downpayment:</span>
                                                             }
-                                                            {!finance==="In-House" &&
+                                                           {finance==="Pag-ibig" &&
                                                                 <span> Total Equity Fee:</span> 
                                                             }
                                                             
@@ -396,7 +397,7 @@ class SinglePayment extends Component {
                                                             {finance==="In-House" &&
                                                                 <span>Monthly Downpayment:</span>
                                                             }
-                                                            {!finance==="In-House" &&
+                                                            {finance==="Pag-ibig" &&
                                                                 <span>Monthly Equity Fee:</span> 
                                                             }
                                                             
@@ -492,6 +493,7 @@ class SinglePayment extends Component {
         const getMisctAmortId=(value)=>{
             TodoStore.setUpdateId(value);
             TodoStore.setUpdateModal(true);
+          
         }
         const getMiscVoidId=(value)=>{
             TodoStore.setUpdateId(value);
@@ -504,6 +506,7 @@ class SinglePayment extends Component {
         const getEquityAmortId=(value)=>{
             TodoStore.setUpdateId(value);
             TodoStore.setAddModal(true);
+           
         }
         const submitPaidEquity=()=>{
             var paymenttype = TodoStore.getPaymentType;
@@ -602,6 +605,9 @@ class SinglePayment extends Component {
                         TodoStore.setAddModal(false);
                         TodoStore.setAdding(true);
                         loadRecords();
+                        var process = "Void Equity";
+                        var logs="Void payment of client for equity";
+                        addSystemLog(process,logs);
                     })
                    
                     // console.log("New Balance: "+newcurrent);
@@ -680,6 +686,9 @@ class SinglePayment extends Component {
                         TodoStore.setAddModal(false);
                         TodoStore.setAdding(true);
                         loadRecords();
+                        var process = "Void Miscellaneous";
+                        var logs="Void payment of client for miscellaneous";
+                        addSystemLog(process,logs);
                     })
                    
                     // console.log("New Balance: "+newcurrent);
@@ -778,6 +787,9 @@ class SinglePayment extends Component {
                     TodoStore.setUpdateModal(false);
                     TodoStore.setAdding(true);
                     loadRecords();
+                    var process = "Penalty Equity";
+                    var logs="Add penalty for client for equity";
+                    addSystemLog(process,logs);
             })
         }
         const computePenalty=(value)=>{
@@ -847,6 +859,9 @@ class SinglePayment extends Component {
                     TodoStore.setUpdateModal(false);
                     TodoStore.setAdding(true);
                     loadRecords();
+                    var process = "Penalty Miscellaneous";
+                    var logs="Add penalty for client for miscellaneous";
+                    addSystemLog(process,logs);
             })
         }
         const payEquity = () => {
@@ -881,8 +896,15 @@ class SinglePayment extends Component {
                      penalty=(((amortamount-paid)*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
                 }else{
                     if(amortamount<paid){
-                         var change = paid-amortamount;
-                         penalty=((amortpenalty)-change).toFixed(2);
+                        var change = parseFloat(paid)-parseFloat(amortamount);
+                        paid=parseFloat(paid)-parseFloat(change)
+                        if(change>amortpenalty){
+                            var others = change-amortpenalty;
+                            paid=parseFloat(paid)+parseFloat(others)
+                            penalty=0.00;
+                        }else{
+                            penalty=((amortpenalty)-change).toFixed(2);
+                        }
                     }else{
                          penalty =amortpenalty.toFixed(2);
                     }
@@ -890,11 +912,18 @@ class SinglePayment extends Component {
                 }
                 balance = runningbalance - paid;
                 console.log(penalty);
+                var today = new Date();
+                var dd = String(today.getDate()).padStart(2, '0');
+                var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                var yyyy = today.getFullYear();
+                today = yyyy +'-'+ mm + '-' + dd ;
+               var datepaid=today;
                 const cash={
                     payment2:paid,
                     amortpenalty:penalty,
                     paymenttype:paymenttype,
                     runningbalance:balance,
+                    datepaid:datepaid,
                     aror:ar,
                     status:'PAID' 
                 }
@@ -919,6 +948,7 @@ class SinglePayment extends Component {
                  payment2 :'',
                  aror:'',
                  paymenttype :'',
+                 datepaid:'',
                  chequenumber :'',
                  bankname :'',
                  branch:'',
@@ -938,6 +968,9 @@ class SinglePayment extends Component {
                      TodoStore.setAddModal(false);
                      TodoStore.setAdding(true);
                      loadRecords();
+                     var process = "Pay Equity";
+                    var logs="Enter payment of client for equity";
+                    addSystemLog(process,logs);
              })
  
  
@@ -947,8 +980,15 @@ class SinglePayment extends Component {
                      penalty=(((amortamount-paid)*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
                 }else{
                     if(amortamount<paid){
-                         var change = paid-amortamount;
-                         penalty=((amortpenalty)-change).toFixed(2);
+                        var change = parseFloat(paid)-parseFloat(amortamount);
+                        paid=parseFloat(paid)-parseFloat(change)
+                        if(change>amortpenalty){
+                            var others = change-amortpenalty;
+                            paid=parseFloat(paid)+parseFloat(others)
+                            penalty=0.00;
+                        }else{
+                            penalty=((amortpenalty)-change).toFixed(2);
+                        }
                     }else{
                          penalty =amortpenalty.toFixed(2);
                     }
@@ -956,11 +996,18 @@ class SinglePayment extends Component {
                 }
                 balance = runningbalance - paid;
                 console.log(penalty);
+                var today = new Date();
+                var dd = String(today.getDate()).padStart(2, '0');
+                var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                var yyyy = today.getFullYear();
+                today = yyyy +'-'+ mm + '-' + dd ;
+               var datepaid=today;
                 const cash={
                     payment2:paid,
                     amortpenalty:penalty,
                     paymenttype:paymenttype,
                     runningbalance:balance,
+                    datepaid:datepaid,
                     aror:ar,
                     status:'PAID' 
                 }
@@ -985,6 +1032,7 @@ class SinglePayment extends Component {
                  payment2 :'',
                  aror:'',
                  paymenttype :'',
+                 datepaid:'',
                  chequenumber :'',
                  bankname :'',
                  branch:'',
@@ -1004,6 +1052,9 @@ class SinglePayment extends Component {
                      TodoStore.setAddModal(false);
                      TodoStore.setAdding(true);
                      loadRecords();
+                     var process = "Pay Equity";
+                    var logs="Enter payment of client for equity";
+                    addSystemLog(process,logs);
              })
             }else{
                  TodoStore.setAdding(true);
@@ -1014,8 +1065,15 @@ class SinglePayment extends Component {
                  penalty=(((amortamount-paid)*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
                  }else{
                      if(amortamount<paid){
-                             var change = paid-amortamount;
-                             penalty=((amortpenalty)-change).toFixed(2);
+                        var change = parseFloat(paid)-parseFloat(amortamount);
+                        paid=parseFloat(paid)-parseFloat(change)
+                        if(change>amortpenalty){
+                            var others = change-amortpenalty;
+                            paid=parseFloat(paid)+parseFloat(others)
+                            penalty=0.00;
+                        }else{
+                            penalty=((amortpenalty)-change).toFixed(2);
+                        }
                      }else{
                              penalty =amortpenalty.toFixed(2);
                      }
@@ -1023,12 +1081,19 @@ class SinglePayment extends Component {
                  }
                  balance = runningbalance - paid;
                  console.log(penalty);
+                 var today = new Date();
+                 var dd = String(today.getDate()).padStart(2, '0');
+                 var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                 var yyyy = today.getFullYear();
+                 today = yyyy +'-'+ mm + '-' + dd ;
+                var datepaid=today;
                  const cheque={
                      payment2:paid,
                      amortpenalty:penalty,
                      paymenttype:paymenttype,
                      chequenumber:bankcheque,
                      bankname:bankname,
+                     datepaid,datepaid,
                      branch:bankbranch,
                      status:'PAID' 
                  }
@@ -1053,6 +1118,7 @@ class SinglePayment extends Component {
                      payment2 :'',
                      aror:'',
                      paymenttype :'',
+                     datepaid:'',
                      chequenumber :'',
                      bankname :'',
                      branch:'',
@@ -1072,6 +1138,9 @@ class SinglePayment extends Component {
                          TodoStore.setAddModal(false);
                          TodoStore.setAdding(true);
                          loadRecords();
+                         var process = "Pay Equity";
+                    var logs="Enter payment of client for equity";
+                    addSystemLog(process,logs);
                  })
             }
          }
@@ -1107,8 +1176,17 @@ class SinglePayment extends Component {
                     penalty=(((amortamount-paid)*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
                }else{
                    if(amortamount<paid){
-                        var change = paid-amortamount;
-                        penalty=((amortpenalty)-change).toFixed(2);
+                        var change = parseFloat(paid)-parseFloat(amortamount);
+                        paid=parseFloat(paid)-parseFloat(change)
+                        if(change>amortpenalty){
+                            var others = change-amortpenalty;
+                            paid=parseFloat(paid)+parseFloat(others)
+                            penalty=0.00;
+                        }else{
+                            penalty=((amortpenalty)-change).toFixed(2);
+                        }
+                        
+                       
                    }else{
                         penalty =amortpenalty.toFixed(2);
                    }
@@ -1116,11 +1194,18 @@ class SinglePayment extends Component {
                }
                balance = runningbalance - paid;
                console.log(penalty);
+               var today = new Date();
+               var dd = String(today.getDate()).padStart(2, '0');
+               var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+               var yyyy = today.getFullYear();
+               today = yyyy +'-'+ mm + '-' + dd ;
+              var datepaid=today;
                const cash={
                    payment2:paid,
                    amortpenalty:penalty,
                    runningbalance : balance,
                    paymenttype:paymenttype,
+                   datepaid:datepaid,
                    aror:ar,
                    status:'PAID' 
                }
@@ -1145,6 +1230,7 @@ class SinglePayment extends Component {
                 payment2 :'',
                 aror:'',
                 paymenttype :'',
+                datepaid:'',
                 chequenumber :'',
                 bankname :'',
                 branch:'',
@@ -1164,6 +1250,9 @@ class SinglePayment extends Component {
                     TodoStore.setUpdateModal(false);
                     TodoStore.setAdding(true);
                     loadRecords();
+                    var process = "Pay Miscellaneous";
+                    var logs="Enter payment of client for miscellaneous";
+                    addSystemLog(process,logs);
             })
 
 
@@ -1173,8 +1262,16 @@ class SinglePayment extends Component {
                  penalty=(((amortamount-paid)*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
             }else{
                 if(amortamount<paid){
-                     var change = paid-amortamount;
-                     penalty=((amortpenalty)-change).toFixed(2);
+                    var change = parseFloat(paid)-parseFloat(amortamount);
+                    paid=parseFloat(paid)-parseFloat(change)
+                    if(change>amortpenalty){
+                        var others = change-amortpenalty;
+                        paid=parseFloat(paid)+parseFloat(others);
+                        penalty=0.00;
+                    }else{
+                        penalty=((amortpenalty)-change).toFixed(2);
+                    }
+                    
                 }else{
                      penalty =amortpenalty.toFixed(2);
                 }
@@ -1182,11 +1279,18 @@ class SinglePayment extends Component {
             }
             balance = runningbalance - paid;
             console.log(penalty);
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var yyyy = today.getFullYear();
+            today = yyyy +'-'+ mm + '-' + dd ;
+           var datepaid=today;
             const cash={
                 payment2:paid,
                 amortpenalty:penalty,
                 runningbalance : balance,
                 paymenttype:paymenttype,
+                datepaid:datepaid,
                 aror:ar,
                 status:'PAID' 
             }
@@ -1200,6 +1304,8 @@ class SinglePayment extends Component {
          var years = dt.getFullYear();
          var newdate = years+"/"+monthss+"/"+days;
           
+
+        
          const miscpayment ={
              clientid :TodoStore.getClientId,
              propertyid : TodoStore.getPropertyId,
@@ -1211,6 +1317,7 @@ class SinglePayment extends Component {
              payment2 :'',
              aror:'',
              paymenttype :'',
+             datepaid:'',
              chequenumber :'',
              bankname :'',
              branch:'',
@@ -1230,6 +1337,9 @@ class SinglePayment extends Component {
                  TodoStore.setUpdateModal(false);
                  TodoStore.setAdding(true);
                  loadRecords();
+                 var process = "Pay Miscellaneous";
+                 var logs="Enter payment of client for miscellaneous";
+                 addSystemLog(process,logs);
          })
            }else{
                 TodoStore.setAdding(true);
@@ -1240,8 +1350,16 @@ class SinglePayment extends Component {
                 penalty=(((amortamount-paid)*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
                 }else{
                     if(amortamount<paid){
-                            var change = paid-amortamount;
+                        var change = parseFloat(paid)-parseFloat(amortamount);
+                        paid=parseFloat(paid)-parseFloat(change)
+                        if(change>amortpenalty){
+                            var others = change-amortpenalty;
+                            paid=parseFloat(paid)+parseFloat(others);
+                            penalty=0.00;
+                        }else{
                             penalty=((amortpenalty)-change).toFixed(2);
+                        }
+                        
                     }else{
                             penalty =amortpenalty.toFixed(2);
                     }
@@ -1249,11 +1367,18 @@ class SinglePayment extends Component {
                 }
                 balance = runningbalance - paid;
                 console.log(penalty);
+                var today = new Date();
+                var dd = String(today.getDate()).padStart(2, '0');
+                var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                var yyyy = today.getFullYear();
+                today = yyyy +'-'+ mm + '-' + dd ;
+               var datepaid=today;
                 const cheque={
                     payment2:paid,
                     amortpenalty:penalty,
                     paymenttype:paymenttype,
                     chequenumber:bankcheque,
+                    datepaid:datepaid,
                     bankname:bankname,
                     branch:bankbranch,
                     status:'PAID' 
@@ -1279,6 +1404,7 @@ class SinglePayment extends Component {
                     payment2 :'',
                     aror:'',
                     paymenttype :'',
+                    datepaid:datepaid,
                     chequenumber :'',
                     bankname :'',
                     branch:'',
@@ -1298,6 +1424,9 @@ class SinglePayment extends Component {
                         TodoStore.setUpdateModal(false);
                         TodoStore.setAdding(true);
                         loadRecords();
+                        var process = "Pay Miscellaneous";
+                        var logs="Enter payment of client for miscellaneous";
+                        addSystemLog(process,logs);
                 })
            }
         }
@@ -1680,6 +1809,7 @@ class SinglePayment extends Component {
 
         const dataequity = dataEquity.map((records,index)=>{
             if(records.status==="NEW"){
+                
                 return(
                     <tr>
                         <td style={{
@@ -2008,11 +2138,38 @@ class SinglePayment extends Component {
             }
            
         })
+       
 
-console.log(dataSource);
-console.log(dataEquity);
-console.log(dataMisc);
-        return (
+    const addSystemLog=(process,logs)=>{
+        //logss
+        var d = new Date();
+        var year = d.getFullYear();
+        var month = d.getMonth();
+        var day = d.getDate();
+        var today = year+"-"+month+"-"+day;
+        var hours = d.getHours();
+        var minutes = d.getMinutes();
+        var seconds = d.getSeconds();
+        var currenttime = hours+":"+minutes+":"+seconds;
+        var datetime=today+" "+currenttime;
+        var email = reactLocalStorage.get('useremail');
+        const userlog ={
+            clientid :email,
+            process:process,
+            datetimes:datetime,
+            dates:today,
+            times:currenttime,
+            logs:logs,
+            status:'UNREAD'
+        }
+        var port = TodoStore.getPort;
+        axios.post(port+'systemlogrouter/add', userlog)
+        .then(res => {
+            console.log(res.data);
+        })
+        
+    }
+        return ( 
             <React.Fragment>
                  <Container fluid={true} style={{ minHeight: '40em', height: 'auto', marginTop: '1em', backgroundColor: '#eeeeee' }}>
                     <Row>
@@ -2650,7 +2807,7 @@ console.log(dataMisc);
                                                                 {finance==="In-House" &&
                                                                     <span>DOWNPAYMENT</span>
                                                                 }
-                                                                {!finance==="In-House" &&
+                                                               {finance==="Pag-ibig" &&
                                                                     <span>EQUITY FEE</span>
                                                                 }
                                                                
@@ -2668,7 +2825,7 @@ console.log(dataMisc);
                                                                 {finance==="In-House" &&
                                                                     <span>DOWNPAYMENT PENALTY</span>
                                                                 }
-                                                                {!finance==="In-House" &&
+                                                               {finance==="Pag-ibig" &&
                                                                     <span>EQUITY PENALTY</span>
                                                                 }
                                                                

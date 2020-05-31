@@ -56,6 +56,37 @@ class PageContent extends Component {
         const TodoStore = this.props.TodoStore;
         var { isloaded, items, sizes } = this.state;
 
+
+        const addSystemLog=(process,logs)=>{
+            //logss
+            var d = new Date();
+            var year = d.getFullYear();
+            var month = d.getMonth();
+            var day = d.getDate();
+            var today = year+"-"+month+"-"+day;
+            var hours = d.getHours();
+            var minutes = d.getMinutes();
+            var seconds = d.getSeconds();
+            var currenttime = hours+":"+minutes+":"+seconds;
+            var datetime=today+" "+currenttime;
+            var email = reactLocalStorage.get('useremail');
+            const userlog ={
+                clientid :email,
+                process:process,
+                datetimes:datetime,
+                dates:today,
+                times:currenttime,
+                logs:logs,
+                status:'UNREAD'
+            }
+            var port = TodoStore.getPort;
+            axios.post(port+'systemlogrouter/add', userlog)
+            .then(res => {
+                console.log(res.data);
+            })
+            
+        }
+
         const dataSource = [];
 
         items.map(item => (
@@ -107,6 +138,9 @@ class PageContent extends Component {
                             getPaymentScheme();
                             TodoStore.setAdding(false);
                             TodoStore.setHandleCancel();
+                            var process = "Add Data";
+                            var logs="Add payment scheme in the system";
+                            addSystemLog(process,logs);
                         } else {
                             openNotification("Server");
                             TodoStore.setAdding(false);
@@ -150,6 +184,9 @@ class PageContent extends Component {
                             getPaymentScheme();
                             TodoStore.setAdding(false);
                             TodoStore.setHandleCancel();
+                            var process = "Update Data";
+                            var logs="Update payment scheme in the system";
+                            addSystemLog(process,logs);
                         } else {
                             TodoStore.setAdding(false);
                             openNotification("Server");
@@ -171,6 +208,9 @@ class PageContent extends Component {
                         TodoStore.setLoading(false);
                         getPaymentScheme();
                         openNotification("Removed");
+                        var process = "Remove Data";
+                        var logs="Remove payment scheme in the system";
+                        addSystemLog(process,logs);
                     } else {
                         TodoStore.setLoading(false);
                         openNotification("Server");
@@ -578,8 +618,10 @@ class PageContent extends Component {
                                             <h4 style={{ color: '#c4c4c4', fontSize: '1em' }}>Years</h4>
                                         </Col>
                                         <Col xs={12} md={12} >
-                                            <Input placeholder="Enter years *(Required)"
-                                                onChange={TodoStore.setYears}
+                                            <InputNumber 
+                                                style={{width:'100%'}}
+                                                placeholder="Enter years *(Required)"
+                                                onChange={TodoStore.setYears2}
                                                 value={TodoStore.getYears}
                                             />
                                         </Col>
@@ -587,8 +629,10 @@ class PageContent extends Component {
                                             <h4 style={{ color: '#c4c4c4', fontSize: '1em' }}>Percentage</h4>
                                         </Col>
                                         <Col xs={12} md={12} >
-                                            <Input placeholder="Enter percentage in decimal *(Required)"
-                                                onChange={TodoStore.setSchemePercentage}
+                                            <InputNumber 
+                                                style={{width:'100%'}}
+                                                placeholder="Enter percentage in decimal *(Required)"
+                                                onChange={TodoStore.setSchemePercentage2}
                                                 value={TodoStore.getSchemePercentage}
                                             />
                                         </Col>
@@ -638,8 +682,10 @@ class PageContent extends Component {
                                         <h4 style={{ color: '#c4c4c4', fontSize: '1em' }}>Years</h4>
                                     </Col>
                                     <Col xs={12} md={12} >
-                                        <Input placeholder="Enter years *(Required)"
-                                            onChange={TodoStore.setYears}
+                                        <InputNumber
+                                            style={{width:'100%'}}
+                                            placeholder="Enter years *(Required)"
+                                            onChange={TodoStore.setYears2}
                                             value={TodoStore.getYears}
                                         />
                                     </Col>
@@ -647,8 +693,10 @@ class PageContent extends Component {
                                         <h4 style={{ color: '#c4c4c4', fontSize: '1em' }}>Percentage</h4>
                                     </Col>
                                     <Col xs={12} md={12} >
-                                        <Input placeholder="Enter percentage in decimal *(Required)"
-                                            onChange={TodoStore.setSchemePercentage}
+                                        <InputNumber 
+                                            style={{width:'100%'}}
+                                            placeholder="Enter percentage in decimal *(Required)"
+                                            onChange={TodoStore.setSchemePercentage2}
                                             value={TodoStore.getSchemePercentage}
                                         />
                                     </Col>

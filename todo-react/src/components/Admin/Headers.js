@@ -11,6 +11,8 @@ const { Header, Content, Footer, Sider } = Layout;
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 const ButtonGroup = Button.Group;
+
+var count=0;
 @inject('TodoStore')
 @observer
 class Headers extends Component {
@@ -19,7 +21,7 @@ class Headers extends Component {
         this.state = {
             isdefault: false,
             sizes:0,
-         
+            logs:[],
 
         }
     }
@@ -35,18 +37,53 @@ class Headers extends Component {
                 isdefault: true
             });
         }
+        const TodoStore = this.props.TodoStore;
+        var port = TodoStore.getPort;
+        fetch(port + 'voucherrouter/')
+            .then(res => res.json())
+            .then(json => {
+                this.setState({
+                    logs: json,
+                })
+            });
         window.addEventListener("resize", this.resize.bind(this));
         this.resize();
     }
 
     render() {
         const TodoStore = this.props.TodoStore;
-        var {isdefault,sizes} = this.state;
+        var {isdefault,sizes,logs} = this.state;
+        const dataSource=[];
+        console.log(logs);
+        count=0;
+        logs.map((data)=>{
+            if(data.status==="FOR APPROVAL"){
+                dataSource.push({
+                    key:data._id,
+                    dates:data.dates,
+                })
+                count++;
+            }
+        })
+       const gotoVoucher=()=>{
+           window.open("/payable","_self")
+       }
+        const notif = dataSource.map((record,index)=>{
+
+            return(
+                <Menu.Item key={record.key} onClick={gotoVoucher}>
+                     New voucher for approval dated {record.dates}.
+                </Menu.Item>
+            )
+        })
+
         const gotoLogout = () =>{
             reactLocalStorage.clear();
             window.open("/","_self");
         }
-
+        const gotoMyAccount=()=>{
+            window.open("/account","_self");
+        }
         if(reactLocalStorage.get("usertype")===undefined){
             window.open("/","_self");
         }
@@ -72,10 +109,11 @@ class Headers extends Component {
                                     textAlign: 'right',
                                     borderStyle:'none'
                             }}>
+                             { reactLocalStorage.get('usertype')=="superadministrator" &&     
                                 <SubMenu className="head-menu"
                                     title={
                                         <React.Fragment>
-                                            <Badge count={5}>
+                                            <Badge count={count}>
                                                 <span >
                                                     <Icon type="global"
                                                     style={{fontSize:'1.5em'}}
@@ -89,9 +127,9 @@ class Headers extends Component {
                                     style={{borderStyle:'none'}}
                                    
                                     >
-                                    <Menu.Item key="1">Notification 1</Menu.Item>
-                                    <Menu.Item >Notification 2</Menu.Item>
+                                    {notif}
                                 </SubMenu>
+                            }
                                 <SubMenu 
                                     title={
                                         <React.Fragment>
@@ -110,7 +148,7 @@ class Headers extends Component {
                                         </React.Fragment>
 
                                     }>
-                                    <Menu.Item key="1">My Account</Menu.Item>
+                                    <Menu.Item key="1" onClick={gotoMyAccount}>My Account</Menu.Item>
                                     <Menu.Item onClick={gotoLogout}>Logout</Menu.Item>
                                 </SubMenu>
 

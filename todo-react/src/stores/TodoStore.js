@@ -479,6 +479,12 @@ class TodoStore {
 @action setEquity = (e) => {
   this.equity=e.target.value;
 }
+@action setEquity2 = (value) => {
+  this.equity=value;
+}
+@action setMisc2 = (value) => {
+  this.misc=value;
+}
 @action setMisc = (e) => {
   this.misc=e.target.value;
 }

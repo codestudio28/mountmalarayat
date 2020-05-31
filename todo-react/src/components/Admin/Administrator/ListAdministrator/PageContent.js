@@ -92,13 +92,13 @@ class PageContent extends Component {
                 TodoStore.setAdding(true);
                 var tempDate = new Date();
                 var date_created = tempDate.getFullYear() + '-' + (tempDate.getMonth() + 1) + '-' + tempDate.getDate();
-                var result           = 'AAA';
-                var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                var charactersLength = characters.length;
+                var result           = 'MOUNTMALARAYAT';
+                // var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                // var charactersLength = characters.length;
 
-                for ( var i = 0; i < 6; i++ ) {
-                    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-                }
+                // for ( var i = 0; i < 6; i++ ) {
+                //     result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                // }
                
                
                 const account = {

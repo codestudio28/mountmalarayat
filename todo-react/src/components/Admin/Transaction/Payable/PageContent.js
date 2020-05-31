@@ -10,6 +10,7 @@ import { inject, observer } from 'mobx-react';
 import axios from "axios";
 import BreadCrumb from '../../BreadCrumb';
 import moment from 'moment';
+import { reactLocalStorage } from 'reactjs-localstorage';
 
 
 const { Search } = Input;
@@ -431,17 +432,21 @@ class PageContent extends Component {
                                                <Icon type="delete" style={{ color: '#fff', fontSize: '1.25em' }}></Icon>
                                            </Button>
                                            </Popconfirm>
-                                           <Popconfirm
-                                                       placement="topRight"
-                                                       title="Do you want to approve this voucher?"
-                                                       onConfirm={(event)=>approveVoucher(data.key)}
-                                                       okText="Yes"
-                                                       cancelText="No"
-                                                   >
-                                           <Button style={{ backgroundColor: '#1d39c4' }}>
-                                               <Icon type="check" style={{ color: '#fff', fontSize: '1.25em' }}></Icon>
-                                           </Button>
-                                           </Popconfirm>
+                                         
+                                        { reactLocalStorage.get('usertype')=="superadministrator" &&
+                                            <Popconfirm
+                                            placement="topRight"
+                                            title="Do you want to approve this voucher?"
+                                            onConfirm={(event)=>approveVoucher(data.key)}
+                                            okText="Yes"
+                                            cancelText="No"
+                                                 >
+                                            <Button style={{ backgroundColor: '#1d39c4' }}>
+                                                <Icon type="check" style={{ color: '#fff', fontSize: '1.25em' }}></Icon>
+                                            </Button>
+                                            </Popconfirm>
+                                        }
+                                          
                                        </React.Fragment>
                                        
                                        }
@@ -615,7 +620,7 @@ class PageContent extends Component {
                 <Container fluid={true} style={{ minHeight: '40em', height: 'auto', marginTop: '1em', backgroundColor: '#eeeeee' }}>
                     <Row>
                         <Col xs={12} md={12}>
-                            <BreadCrumb location="Transaction / List of Transactions" />
+                            <BreadCrumb location="Transaction / Account's Payable" />
                         </Col>
                         <Col xs={12} md={12} style={{ padding: '1em' }}>
                             <div style={{ padding: '1em', backgroundColor: '#fff', minHeight: '1em' }}>

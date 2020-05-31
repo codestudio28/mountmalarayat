@@ -7,6 +7,7 @@ import { Input } from 'antd';
 import { inject, observer } from 'mobx-react';
 import axios from "axios";
 import BreadCrumb from '../../BreadCrumb';
+import { reactLocalStorage } from 'reactjs-localstorage';
 
 
 
@@ -57,6 +58,37 @@ class PageContent extends Component {
 
         const dataSource = [];
 
+        const addSystemLog=(process,logs)=>{
+            //logss
+            var d = new Date();
+            var year = d.getFullYear();
+            var month = d.getMonth();
+            var day = d.getDate();
+            var today = year+"-"+month+"-"+day;
+            var hours = d.getHours();
+            var minutes = d.getMinutes();
+            var seconds = d.getSeconds();
+            var currenttime = hours+":"+minutes+":"+seconds;
+            var datetime=today+" "+currenttime;
+            var email = reactLocalStorage.get('useremail');
+            const userlog ={
+                clientid :email,
+                process:process,
+                datetimes:datetime,
+                dates:today,
+                times:currenttime,
+                logs:logs,
+                status:'UNREAD'
+            }
+            var port = TodoStore.getPort;
+            axios.post(port+'systemlogrouter/add', userlog)
+            .then(res => {
+                console.log(res.data);
+            })
+            
+        }
+    
+
         items.filter(item => {
             return item.status.indexOf("ACTIVE") >= 0
         })
@@ -89,11 +121,14 @@ class PageContent extends Component {
         }
         const addClient = () => {
             if ((TodoStore.getFirstname.length === 0) || (TodoStore.getLastname.length === 0)
-                || (TodoStore.getMiddlename.length === 0) || (TodoStore.getContactNumber.length === 0)
-                || (TodoStore.getAddress.length === 0) || (TodoStore.getCity.length === 0)
+                || (TodoStore.getMiddlename.length === 0)|| (TodoStore.getAddress.length === 0) 
+                || (TodoStore.getCity.length === 0)
                 || (TodoStore.getProvince.length === 0)) {
                 openNotification("Blank");
             } else {
+                if(TodoStore.getContactNumber.length===0){
+                    TodoStore.setContactNumber2("N/A");
+                }
                 TodoStore.setAdding(true);
                 const client = {
                     lastname: TodoStore.getLastname,
@@ -120,6 +155,9 @@ class PageContent extends Component {
                             openNotification("Success");
                             getClient();
                             TodoStore.setHandleCancel();
+                            var process = "Add Data";
+                            var logs="Add client to the system";
+                            addSystemLog(process,logs);
                         } else {
                             TodoStore.setAdding(false);
                             openNotification("Server");
@@ -144,11 +182,14 @@ class PageContent extends Component {
         }
         const updateClient = () => {
             if ((TodoStore.getFirstname.length === 0) || (TodoStore.getLastname.length === 0)
-                || (TodoStore.getMiddlename.length === 0) || (TodoStore.getContactNumber.length === 0)
+                || (TodoStore.getMiddlename.length === 0) 
                 || (TodoStore.getAddress.length === 0) || (TodoStore.getCity.length === 0)
                 || (TodoStore.getProvince.length === 0)) {
                 openNotification("Blank");
             } else {
+                if(TodoStore.getContactNumber.length===0){
+                    TodoStore.setContactNumber2("N/A");
+                }
                 TodoStore.setAdding(true);
                 let id = TodoStore.getUpdateId;
                 const client = {
@@ -173,6 +214,9 @@ class PageContent extends Component {
                             openNotification("Update");
                             getClient();
                             TodoStore.setHandleCancel();
+                            var process = "Update Data";
+                            var logs="Update client in the system";
+                            addSystemLog(process,logs);
                         } else {
                             TodoStore.setAdding(false);
                             openNotification("Server");
@@ -194,6 +238,9 @@ class PageContent extends Component {
                         getClient();
                         TodoStore.setLoading(false);
                         openNotification("Removed");
+                        var process = "Remove Data";
+                            var logs="Remove client in the system";
+                            addSystemLog(process,logs);
                     } else {
                         TodoStore.setLoading(false);
                         openNotification("Server");
