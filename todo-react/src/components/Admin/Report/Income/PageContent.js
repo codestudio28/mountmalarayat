@@ -474,11 +474,11 @@ class PageContent extends Component {
                                             </Col>
     <Modal
           visible={TodoStore.getDateModal}
-          title="Title"
+          title="Choose Date"
           
           onCancel={TodoStore.setHandleCancel}
           footer={[
-            <Button key="back" onClick={this.handleCancel}>
+            <Button key="back" onClick={TodoStore.setHandleCancel}>
               Return
             </Button>,
             

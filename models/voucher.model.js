@@ -8,6 +8,7 @@ const voucherSchema = new Schema({
     amount:{type:String},
     cv:{type:String},
     bank:{type:String},
+    explanation:{type:String},
     cheque:{type:String},
     terms:{type:String},
     prepared:{type:String},

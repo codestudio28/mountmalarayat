@@ -164,6 +164,9 @@ class TodoStore {
 @action setApprovedBy2 = (value) => {
   this.approvedby=value;
 }
+@action setVoucherDate2 = (value) => {
+  this.voucherdate=value;
+}
 @action setVoucherDate = (date,dateString) => {
   this.voucherdate=dateString;
 }
@@ -191,6 +194,9 @@ class TodoStore {
 }
 @action setBankName = (e) => {
   this.bankname=e.target.value;
+}
+@action setBankName2 = (value) => {
+  this.bankname=value;
 }
 @action setBankBranch = (e) => {
   this.bankbranch=e.target.value;

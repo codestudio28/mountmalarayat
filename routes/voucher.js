@@ -8,6 +8,7 @@ router.route('/add').post((req, res) => {
     const amount = req.body.amount;
     const cv = req.body.cv;
     const bank = req.body.bank;
+    const explanation = req.body.explanation;
     const cheque = req.body.cheque;
     const terms = req.body.terms;
     const prepared = req.body.prepared;
@@ -21,6 +22,7 @@ router.route('/add').post((req, res) => {
         amount,
         cv,
         bank,
+        explanation,
         cheque,
         terms,
         prepared ,
@@ -52,37 +54,41 @@ router.route('/').get((req, res) => {
     });
 });
 
-// Update Client information
-// router.route('/update/:id').post((req,res) =>{
-//     Client.findById(req.params.id)
-//       .then(client => {
-//         client.lastname = req.body.lastname;
-//         client.firstname = req.body.firstname;
-//         client.middlename = req.body.middlename;
-//         client.contactnumber = req.body.contactnumber;
-//         client.address = req.body.address;
-//         client.city = req.body.city;
-//         client.province = req.body.province;
+// Update voucher
+router.route('/update/:id').post((req,res) =>{
+    Voucher.findById(req.params.id)
+      .then(voucher => {
+        voucher.dates = req.body.dates;
+        voucher.payee = req.body.payee;
+        voucher.amount = req.body.amount;
+        voucher.cv = req.body.cv;
+        voucher.bank = req.body.bank;
+        voucher.explanation = req.body.explanation;
+        voucher.cheque = req.body.cheque;
+        voucher.terms = req.body.terms;
+        voucher.prepared = req.body.prepared;
+        voucher.noted = req.body.noted;
+        voucher.approved = req.body.approved;
 
-//         client.save()
-//                   .then(() => res.json('101'))
-//                   .catch(err => res.status(400).json('Error: ' + err))
-//       })
-//       .catch(err => res.status(400).json('Error: '+ err))
+        voucher.save()
+                  .then(() => res.json('101'))
+                  .catch(err => res.status(400).json('Error: ' + err))
+      })
+      .catch(err => res.status(400).json('Error: '+ err))
    
-// });
+});
 
-// Update client status
-// router.route('/status/:id').post((req,res) =>{
-//     Client.findById(req.params.id)
-//       .then(client => {
-//         client.status = req.body.status;
-//         client.save()
-//                   .then(() => res.json('101'))
-//                   .catch(err => res.status(400).json('Error: ' + err))
-//       })
-//       .catch(err => res.status(400).json('Error: '+ err))
-// });
+// Update voucher status
+router.route('/status/:id').post((req,res) =>{
+    Voucher.findById(req.params.id)
+      .then(voucher => {
+        voucher.status = req.body.status;
+        voucher.save()
+                  .then(() => res.json('101'))
+                  .catch(err => res.status(400).json('Error: ' + err))
+      })
+      .catch(err => res.status(400).json('Error: '+ err))
+});
 
 // Get client by id
 // router.route('/:id').get((req,res) =>{
@@ -93,7 +99,7 @@ router.route('/').get((req, res) => {
 
 // Delete Client
 router.route('/:id').delete((req, res) => {
-    Amort.findByIdAndDelete(req.params.id)
+    Voucher.findByIdAndDelete(req.params.id)
         .then(() => res.json('101'))
         .catch(err => res.status(400).json('Error: ' + err));
 });
