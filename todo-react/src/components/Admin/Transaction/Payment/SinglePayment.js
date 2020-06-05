@@ -580,7 +580,7 @@ class SinglePayment extends Component {
                     TodoStore.setLoading(true);
 
                     newcurrent=parseFloat(currentbalanceeqt)+parseFloat(currentpay);
-                    newpenalty=(parseFloat(currentpay)*parseFloat(penalty))+parseFloat(currentpenaltyeqt);
+                    newpenalty=(parseFloat(currentpay)*parseFloat(penalty))+(parseFloat(currentpenaltyeqt)*parseFloat(penalty))+parseFloat(currentpenaltyeqt).toFixed(2);
                     // console.log("New Current:"+ newcurrent);
                     // console.log("New penalty:"+ newpenalty);
                     const cash={
@@ -743,7 +743,7 @@ class SinglePayment extends Component {
                 }
             })
             balance = runningbalance.toFixed(2);
-            var penalty = ((amortamount*miscpenalty)+amortpenalty).toFixed(2);
+            var penalty = ((amortamount*miscpenalty)+(amortpenalty*miscpenalty)+amortpenalty).toFixed(2);
             const cash={
                 amortpenalty:penalty,
                 status:'UNPAID' 
@@ -815,7 +815,7 @@ class SinglePayment extends Component {
                 }
             })
             balance = runningbalance.toFixed(2);
-            var penalty = ((amortamount*miscpenalty)+amortpenalty).toFixed(2);
+            var penalty = ((amortamount*miscpenalty)+(amortpenalty*miscpenalty)+amortpenalty).toFixed(2);
             const cash={
                 amortpenalty:penalty,
                 status:'UNPAID' 
@@ -893,7 +893,7 @@ class SinglePayment extends Component {
             if(paymenttype==="Cash"){
              TodoStore.setAdding(true);
                 if(amortamount>paid){
-                     penalty=(((amortamount-paid)*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
+                    penalty=(((amortamount-paid)*parseFloat(miscpenalty))+(amortpenalty*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
                 }else{
                     if(amortamount<paid){
                         var change = parseFloat(paid)-parseFloat(amortamount);
@@ -906,7 +906,7 @@ class SinglePayment extends Component {
                             penalty=((amortpenalty)-change).toFixed(2);
                         }
                     }else{
-                         penalty =amortpenalty.toFixed(2);
+                         penalty =((parseFloat(amortpenalty)*(parseFloat(miscpenalty)))+parseFloat(amortpenalty)).toFixed(2);
                     }
                    
                 }
@@ -977,7 +977,7 @@ class SinglePayment extends Component {
             }else if((paymenttype==="GCash")||(paymenttype==="Paymaya")||(paymenttype==="Paypal")){
                 TodoStore.setAdding(true);
                 if(amortamount>paid){
-                     penalty=(((amortamount-paid)*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
+                    penalty=(((amortamount-paid)*parseFloat(miscpenalty))+(amortpenalty*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
                 }else{
                     if(amortamount<paid){
                         var change = parseFloat(paid)-parseFloat(amortamount);
@@ -990,7 +990,7 @@ class SinglePayment extends Component {
                             penalty=((amortpenalty)-change).toFixed(2);
                         }
                     }else{
-                         penalty =amortpenalty.toFixed(2);
+                        penalty =((parseFloat(amortpenalty)*(parseFloat(miscpenalty)))+parseFloat(amortpenalty)).toFixed(2);
                     }
                    
                 }
@@ -1062,7 +1062,7 @@ class SinglePayment extends Component {
                 var bankbranch = TodoStore.getBankBranch;
                 var bankcheque = TodoStore.getBankCheque;
                 if(amortamount>paid){
-                 penalty=(((amortamount-paid)*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
+                    penalty=(((amortamount-paid)*parseFloat(miscpenalty))+(amortpenalty*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
                  }else{
                      if(amortamount<paid){
                         var change = parseFloat(paid)-parseFloat(amortamount);
@@ -1075,7 +1075,7 @@ class SinglePayment extends Component {
                             penalty=((amortpenalty)-change).toFixed(2);
                         }
                      }else{
-                             penalty =amortpenalty.toFixed(2);
+                        penalty =((parseFloat(amortpenalty)*(parseFloat(miscpenalty)))+parseFloat(amortpenalty)).toFixed(2);
                      }
                      
                  }
@@ -1173,7 +1173,7 @@ class SinglePayment extends Component {
            if(paymenttype==="Cash"){
             TodoStore.setAdding(true);
                if(amortamount>paid){
-                    penalty=(((amortamount-paid)*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
+                    penalty=(((amortamount-paid)*parseFloat(miscpenalty))+(amortpenalty*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
                }else{
                    if(amortamount<paid){
                         var change = parseFloat(paid)-parseFloat(amortamount);
@@ -1188,7 +1188,7 @@ class SinglePayment extends Component {
                         
                        
                    }else{
-                        penalty =amortpenalty.toFixed(2);
+                    penalty =((parseFloat(amortpenalty)*(parseFloat(miscpenalty)))+parseFloat(amortpenalty)).toFixed(2);
                    }
                   
                }
@@ -1259,7 +1259,7 @@ class SinglePayment extends Component {
            }else if((paymenttype==="GCash")||(paymenttype==="Paymaya")||(paymenttype==="Paypal")){
             TodoStore.setAdding(true);
             if(amortamount>paid){
-                 penalty=(((amortamount-paid)*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
+                penalty=(((amortamount-paid)*parseFloat(miscpenalty))+(amortpenalty*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
             }else{
                 if(amortamount<paid){
                     var change = parseFloat(paid)-parseFloat(amortamount);
@@ -1273,7 +1273,7 @@ class SinglePayment extends Component {
                     }
                     
                 }else{
-                     penalty =amortpenalty.toFixed(2);
+                    penalty =((parseFloat(amortpenalty)*(parseFloat(miscpenalty)))+parseFloat(amortpenalty)).toFixed(2);
                 }
                
             }
@@ -1347,7 +1347,7 @@ class SinglePayment extends Component {
                var bankbranch = TodoStore.getBankBranch;
                var bankcheque = TodoStore.getBankCheque;
                if(amortamount>paid){
-                penalty=(((amortamount-paid)*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
+                penalty=(((amortamount-paid)*parseFloat(miscpenalty))+(amortpenalty*parseFloat(miscpenalty))+amortpenalty).toFixed(2);
                 }else{
                     if(amortamount<paid){
                         var change = parseFloat(paid)-parseFloat(amortamount);
@@ -1361,7 +1361,7 @@ class SinglePayment extends Component {
                         }
                         
                     }else{
-                            penalty =amortpenalty.toFixed(2);
+                        penalty =((parseFloat(amortpenalty)*(parseFloat(miscpenalty)))+parseFloat(amortpenalty)).toFixed(2);
                     }
                     
                 }
